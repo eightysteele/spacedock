@@ -1,0 +1,128 @@
+# depends on the .env file in the same directory
+version: '3.8'
+services:
+  xdg:
+    image: xdg-build
+    container_name: xdg-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.xdg
+      tags:
+        - xdg-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+  haskell:
+    image: haskell-build
+    container_name: haskell-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.haskell
+      tags:
+        - haskell-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - GHCUP_USE_XDG_DIRS=${GHCUP_USE_XDG_DIRS}
+        - BOOTSTRAP_HASKELL_NONINTERACTIVE=${BOOTSTRAP_HASKELL_NONINTERACTIVE}
+        - BOOTSTRAP_HASKELL_VERBOSE=${BOOTSTRAP_HASKELL_VERBOSE}
+        - BOOTSTRAP_HASKELL_ADJUST_BASHRC=${BOOTSTRAP_HASKELL_ADJUST_BASHRC}
+    depends_on:
+      - xdg
+  nvm:
+    image: nvm-build
+    container_name: nvm-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.nvm
+      tags:
+        - nvm-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - NVM_VERSION=${NVM_VERSION}
+    depends_on:
+      - xdg
+  docker-lsp:
+    image: docker-lsp-build
+    container_name: docker-lsp-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.docker-lsp
+      tags:
+        - docker-lsp-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - NODE_VERSION=${NODE_VERSION}
+        - NVM_DIR=${NVM_DIR}
+    depends_on:
+      - nvm
+  spellcheck:
+    image: spellcheck-build
+    container_name: spellcheck-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.spellcheck
+      tags:
+        - spellcheck-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+    depends_on:
+      - haskell
+  hadolint:
+    image: hadolint-build
+    container_name: hadolint-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.hadolint
+      tags:
+        - hadolint-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+    depends_on:
+      - haskell
+      - spellcheck
+  spacedock-docker:
+    image: spacedock-docker
+    container_name: spacedock-docker
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.spacedock-docker
+      tags:
+        - spacedock-docker
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - NVM_DIR=${NVM_DIR}
+    depends_on:
+      - hadolint
+      - docker-lsp
+
+# https://github.com/syl20bnr/spacemacs/tree/develop/layers/+tools/docker
+# for the spacedock-docker
+# docker-ce-cli
+# var/run/docker.sock:/var/run/docker.sock 

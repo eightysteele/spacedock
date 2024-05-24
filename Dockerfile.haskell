@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1.7-labs
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG GHCUP_USE_XDG_DIRS
+ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
+ARG BOOTSTRAP_HASKELL_VERBOSE
+ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
+
+################################################################################
+FROM build-xdg AS base
+################################################################################
+
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+ARG GHCUP_USE_XDG_DIRS
+ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
+ARG BOOTSTRAP_HASKELL_VERBOSE
+ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
+
+ENV PATH=${XDG_BIN_HOME}:$PATH
+
+#-------------------------------------------------------------------------------
+# Install dependencies.
+# ------------------------------------------------------------------------------
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN bash -x <<"EOF"
+set -eu
+rm -f /etc/apt/apt.conf.d/docker-clean
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    build-essential \
+    libgmp-dev \
+    zlib1g-dev \
+    git \
+    curl \
+    rsync
+EOF
+
+# ------------------------------------------------------------------------------
+# Build Haskell toolchain.
+# https://github.com/haskell/ghcup-hs/tree/master/scripts/bootstrap
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+cabal update
+cabal install cabal-install
+EOF

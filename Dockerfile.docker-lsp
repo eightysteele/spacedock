@@ -1,0 +1,59 @@
+# syntax=docker/dockerfile:1.7-labs
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG NVM_DIR
+ARG NODE_VERSION
+
+################################################################################
+FROM nvm-build AS base
+################################################################################
+
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG NVM_DIR
+ARG NODE_VERSION
+
+ENV PATH=${XDG_BIN_HOME}:$PATH
+
+#-------------------------------------------------------------------------------
+# Install dependencies.
+# ------------------------------------------------------------------------------
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN bash -x <<"EOF"
+set -eu
+rm -f /etc/apt/apt.conf.d/docker-clean
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    build-essential \
+    git
+EOF
+
+# ------------------------------------------------------------------------------
+# Build dockerfile-language-server
+# https://github.com/rcjsuen/dockerfile-language-server
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+source ${NVM_DIR}/nvm.sh
+nvm install $NODE_VERSION
+nvm use $NODE_VERSION
+nvm alias default $NODE_VERSION
+git clone https://github.com/rcjsuen/dockerfile-language-server.git
+cd dockerfile-language-server
+npm install
+npm audit fix
+npm run build
+npm test
+npm install -g dockerfile-language-server-nodejs
+EOF

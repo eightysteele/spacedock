@@ -1,0 +1,52 @@
+# syntax=docker/dockerfile:1.7-labs
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+################################################################################
+FROM haskell-build AS base
+################################################################################
+
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ENV PATH=${XDG_BIN_HOME}:$PATH
+
+#-------------------------------------------------------------------------------
+# Install dependencies.
+# ------------------------------------------------------------------------------
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN bash -x <<"EOF"
+set -eu
+rm -f /etc/apt/apt.conf.d/docker-clean
+apt-get update
+apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    rsync
+EOF
+
+# ------------------------------------------------------------------------------
+# Build hadolint. 
+# https://github.com/hadolint/hadolint
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+git clone https://github.com/hadolint/hadolint
+cd hadolint
+mv cabal.project.freeze cabal.project.freeze.backup
+cabal update
+cabal configure
+cabal update
+cabal build
+cabal install
+cd dist-newstyle/build/x86_64-linux/ghc-9.4.8/hadolint-2.13.0/x/hadolint/build/
+rsync -L hadolint/hadolint ${XDG_BIN_HOME}/
+EOF
