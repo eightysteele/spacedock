@@ -139,8 +139,38 @@ services:
     depends_on:
       - hadolint
       - docker-lsp
+  project-mlir:
+    image: project-mlir
+    container_name: project-mlir
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.mlir
+      tags:
+        - project-mlir
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - EMACS_DIR=${EMACS_DIR}
+        - NVM_DIR=${NVM_DIR}
+    shm_size: 2g
+    privileged: true
+    devices:
+      - /dev/nvidia0:/dev/nvidia0
+    environment:
+      - DISPLAY=${DISPLAY}
+    stdin_open: true
+    tty: true
+    volumes:
+      - / var/run/docker.sock:/var/run/docker.sock
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    depends_on:
+      - emacs
+      - spacedock-docker
 
 # https://github.com/syl20bnr/spacemacs/tree/develop/layers/+tools/docker
 # for the spacedock-docker
 # docker-ce-cli
-# var/run/docker.sock:/var/run/docker.sock 
+# 
