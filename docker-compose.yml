@@ -15,6 +15,24 @@ services:
         - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
         - XDG_DATA_HOME=${XDG_DATA_HOME}
         - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+  emacs:
+    image: emacs-build
+    container_name: emacs-build
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.emacs
+      tags:
+        - emacs-build
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - EMACS_DIR=${EMACS_DIR}
+        - EMACS_VERSION=${EMACS_VERSION}
+    depends_on:
+      - xdg
   haskell:
     image: haskell-build
     container_name: haskell-build
