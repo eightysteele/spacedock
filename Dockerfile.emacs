@@ -1,30 +1,46 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
-ARG EMACS_DIR
-ARG EMACS_VERSION
+# Builds ${EMACS_VERSION} installed to ${EMACS_DIR}.
+# https://www.gnu.org/software/emacs/news/NEWS.29.3
+#
+# COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
+#
+# Runtime dependencies:
+#   ca-certificates
+#   libxpm4
+#   libpng16-16
+#   libjpeg8
+#   libtiff5
+#   libgif7
+#   librsvg2-2
+#   libwebp7
+#   libgtk-3-0
+#   libgccjit0
+#   libjansson4
+#   libwebkit2gtk-4.0-37
+#   libmagickwand-6.q16-6
+#   libice6
+#   libsm6
+#   curl
+#   git
+#   wget
+
+ARG SPACEDOCK_EMACS_DIR
+ARG SPACEDOCK_EMACS_VERSION
 
 ################################################################################
-FROM xdg-build AS base
+FROM xdg AS emacs
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+ARG SPACEDOCK_EMACS_DIR
+ARG SPACEDOCK_EMACS_VERSION
 
-ARG EMACS_DIR
-ARG EMACS_VERSION
+# ------------------------------------------------------------------------------
+# install build dependencies
+# ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -54,15 +70,19 @@ apt-get install -y --no-install-recommends \
     libjansson-dev
 wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
 gpg --import gnu-keyring.gpg
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 #-------------------------------------------------------------------------------
-# Build emacs.
-# https://www.gnu.org/software/emacs/news/NEWS.29.3
+# build emacs
 #-------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
+export EMACS_DIR=${SPACEDOCK_EMACS_DIR}
+export EMACS_VERSION=${SPACEDOCK_EMACS_VERSION}
 export TZ=America/Los_Angeles
 dir=emacs-${EMACS_VERSION}
 tar=${dir}.tar.gz
@@ -76,7 +96,7 @@ if ! gpg --verify $sig $tar; then
 	  exit 1
 fi
 tar xf $tar
-cd $dir
+pushd $dir
 ./configure \
     --prefix=${EMACS_DIR} \
     --with-xwidgets \
@@ -88,4 +108,6 @@ cd $dir
     --with-mailutils
 make -j$(nproc)
 make install
+popd
+rm -rf *.gz *.sig emacs-${EMACS_VERSION}
 EOF

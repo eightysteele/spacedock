@@ -1,50 +1,44 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
-ARG NVM_DIR
-ARG NODE_VERSION
+# Builds the dockerfile-language-server:
+# https://github.com/rcjsuen/dockerfile-language-server
+#
+# COPY --from=docker-lsp-dep ${NVM_DIR} ${NVM_DIR}
+
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NODE_VERSION
 
 ################################################################################
-FROM nvm-build AS base
+FROM nvm-dep AS docker-lsp-dep
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NODE_VERSION
 
-ARG NVM_DIR
-ARG NODE_VERSION
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
-
-#-------------------------------------------------------------------------------
-# Install dependencies.
+# ------------------------------------------------------------------------------
+# install build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
 rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
-    build-essential \
     git
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Build dockerfile-language-server
-# https://github.com/rcjsuen/dockerfile-language-server
+# build dockerfile-language-server
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
+export NVM_DIR=${SPACEDOCK_NVM_DIR}
+export NODE_VERSION=${SPACEDOCK_NODE_VERSION}
 source ${NVM_DIR}/nvm.sh
 nvm install $NODE_VERSION
 nvm use $NODE_VERSION

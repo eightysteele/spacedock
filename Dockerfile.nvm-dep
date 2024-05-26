@@ -1,39 +1,27 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
-ARG NVM_VERSION
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NVM_VERSION
 
 ################################################################################
-FROM build-xdg AS base
+FROM xdg AS nvm-dep
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
-ARG NVM_VERSION
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NVM_VERSION
 
 #-------------------------------------------------------------------------------
 # Install dependencies.
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
-    build-essential \
     curl
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
@@ -42,5 +30,9 @@ EOF
 # ------------------------------------------------------------------------------
 RUN bash -x <<"EOF"
 set -eu
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash
+export NVM_DIR=${SPACEDOCK_NVM_DIR}
+mkdir ${NVM_DIR} || exit 1
+url=https://raw.githubusercontent.com/nvm-sh/nvm/v${SPACEDOCK_NVM_VERSION}/install.sh
+curl -o- $url | bash
+source $NVM_DIR/nvm.sh
 EOF

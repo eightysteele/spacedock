@@ -1,39 +1,35 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
+# Builds Haskell toolchain into the XDG filesystem, with ghcup and .cabal in
+# $XDG_CONFIG_HOME and all binaries in $XDG_BINARY_HOME:
+# https://github.com/haskell/ghcup-hs/tree/master/scripts/bootstrap
+
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_XDG_CONFIG_HOME
+ARG SPACEDOCK_XDG_DATA_HOME
 ARG GHCUP_USE_XDG_DIRS
 ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
 ARG BOOTSTRAP_HASKELL_VERBOSE
 ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
 
 ################################################################################
-FROM build-xdg AS base
+FROM xdg AS haskell-dep
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_XDG_CONFIG_HOME
+ARG SPACEDOCK_XDG_DATA_HOME
 ARG GHCUP_USE_XDG_DIRS
 ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
 ARG BOOTSTRAP_HASKELL_VERBOSE
 ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# install build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -43,16 +39,25 @@ apt-get install -y --no-install-recommends \
     git \
     curl \
     rsync
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Build Haskell toolchain.
-# https://github.com/haskell/ghcup-hs/tree/master/scripts/bootstrap
+# build haskell
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
+export XDG_BIN_HOME=${SPACEDOCK_XDG_BIN_HOME}
+export XDG_CONFIG_HOME=${SPACEDOCK_XDG_CONFIG_HOME}
+export XDG_DATA_HOME=${SPACEDOCK_XDG_DATA_HOME}
+export PATH=${SPACEDOCK_XDG_BIN_HOME}:${PATH}
+export CABAL_DIR=${SPACEDOCK_XDG_CONFIG_HOME}/.cabal
+mkdir ${CABAL_DIR} || exit 1
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 cabal update
 cabal install cabal-install
+rm -rf ~/.cache
 EOF
