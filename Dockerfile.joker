@@ -1,0 +1,61 @@
+# syntax=docker/dockerfile:1.7-labs
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG GO_DIR
+ARG GO_VERSION
+ARG GOROOT
+ARG GOPATH
+ARG GOBIN
+
+ARG PATH
+
+################################################################################
+FROM go AS base
+################################################################################
+
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG GO_DIR
+ARG GO_VERSION
+ARG GOROOT
+ARG GOPATH
+ARG GOBIN
+
+ARG PATH
+
+ENV PATH=${XDG_BIN_HOME}:$PATH
+
+#-------------------------------------------------------------------------------
+# Install dependencies.
+# ------------------------------------------------------------------------------
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN bash -x <<"EOF"
+set -eu
+rm -f /etc/apt/apt.conf.d/docker-clean
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    build-essential \
+    git
+EOF
+
+# ------------------------------------------------------------------------------
+# Builds and installs joker.
+# https://github.com/candid82/joker
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+git clone https://github.com/candid82/joker.git
+cd joker
+./run.sh --version && go install
+EOF
