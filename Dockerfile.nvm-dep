@@ -1,0 +1,38 @@
+# syntax=docker/dockerfile:1.7-labs
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NVM_VERSION
+
+################################################################################
+FROM xdg AS nvm-dep
+################################################################################
+
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NVM_VERSION
+
+#-------------------------------------------------------------------------------
+# Install dependencies.
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+EOF
+
+# ------------------------------------------------------------------------------
+# Build nvm.
+# https://github.com/nvm-sh/nvm
+# ------------------------------------------------------------------------------
+RUN bash -x <<"EOF"
+set -eu
+export NVM_DIR=${SPACEDOCK_NVM_DIR}
+mkdir ${NVM_DIR} || exit 1
+url=https://raw.githubusercontent.com/nvm-sh/nvm/v${SPACEDOCK_NVM_VERSION}/install.sh
+curl -o- $url | bash
+source $NVM_DIR/nvm.sh
+EOF

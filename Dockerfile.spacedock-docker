@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1.7-labs
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG NVM_DIR
+
+################################################################################
+FROM hadolint-build AS hadolint
+FROM docker-lsp-build AS docker-lsp
+FROM ubuntu:jammy AS base
+################################################################################
+
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
+
+ARG NVM_DIR
+
+RUN bash -x <<"EOF"
+set -eu
+apt-get update
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+EOF
+
+COPY --from=docker-lsp ${NVM_DIR} ${NVM_DIR}
+COPY --from=hadolint ${XDG_BIN_HOME}/hadolint ${XDG_BIN_HOME}/hadolint

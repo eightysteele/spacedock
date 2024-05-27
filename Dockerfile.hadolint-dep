@@ -1,0 +1,55 @@
+# syntax=docker/dockerfile:1.7-labs
+
+# Build hadolint.
+# https://github.com/hadolint/hadolint
+
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_XDG_CONFIG_HOME
+ARG SPACEDOCK_CABAL_DIR
+
+################################################################################
+FROM shellcheck-dep AS hadolint-dep
+################################################################################
+
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_XDG_CONFIG_HOME
+ARG SPACEDOCK_CABAL_DIR
+
+#-------------------------------------------------------------------------------
+# install build dependencies
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    build-essential \
+    git
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+EOF
+
+# ------------------------------------------------------------------------------
+# build hadolint
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+export XDG_BIN_HOME=${SPACEDOCK_XDG_BIN_HOME}
+export XDG_CONFIG_HOME=${SPACEDOCK_XDG_CONFIG_HOME}
+export PATH=${XDG_BIN_HOME}:${PATH}
+export CABAL_DIR=${SPACEDOCK_CABAL_DIR}
+git clone https://github.com/hadolint/hadolint
+pushd hadolint
+mv cabal.project.freeze cabal.project.freeze.backup
+cabal update
+cabal configure
+cabal update
+cabal build
+cabal install
+popd
+rsync -L ${CABAL_DIR}/bin/hadolint ${XDG_BIN_HOME}/
+rm -rf hadolint
+EOF

@@ -1,0 +1,53 @@
+# syntax=docker/dockerfile:1.7-labs
+
+# Builds the dockerfile-language-server:
+# https://github.com/rcjsuen/dockerfile-language-server
+#
+# COPY --from=docker-lsp-dep ${NVM_DIR} ${NVM_DIR}
+
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NODE_VERSION
+
+################################################################################
+FROM nvm-dep AS docker-lsp-dep
+################################################################################
+
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NODE_VERSION
+
+# ------------------------------------------------------------------------------
+# install build dependencies
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+rm -f /etc/apt/apt.conf.d/docker-clean
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+EOF
+
+# ------------------------------------------------------------------------------
+# build dockerfile-language-server
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+export NVM_DIR=${SPACEDOCK_NVM_DIR}
+export NODE_VERSION=${SPACEDOCK_NODE_VERSION}
+source ${NVM_DIR}/nvm.sh
+nvm install $NODE_VERSION
+nvm use $NODE_VERSION
+nvm alias default $NODE_VERSION
+git clone https://github.com/rcjsuen/dockerfile-language-server.git
+cd dockerfile-language-server
+npm install
+npm audit fix
+npm run build
+npm test
+npm install -g dockerfile-language-server-nodejs
+EOF

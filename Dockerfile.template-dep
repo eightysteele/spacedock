@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:1.7-labs
+
+# write some docs...
+
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NODE_VERSION
+
+################################################################################
+FROM xdg-dep AS template-dep
+################################################################################
+
+ARG SPACEDOCK_NVM_DIR
+ARG SPACEDOCK_NODE_VERSION
+
+# ------------------------------------------------------------------------------
+# install build dependencies
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+rm -f /etc/apt/apt.conf.d/docker-clean
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    git
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+EOF
+
+# ------------------------------------------------------------------------------
+# build
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+# set env...
+export NVM_DIR=${SPACEDOCK_NVM_DIR}
+export NODE_VERSION=${SPACEDOCK_NODE_VERSION}
+# download, build, install...
+# cleanup...
+EOF
