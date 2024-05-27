@@ -1,0 +1,15 @@
+# template
+services:
+  nvidia-llvm:
+    image: nvidia-llvm
+    container_name: nvidia-llvm
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.nvidia-llvm
+      tags:
+        - nvidia-llvm
+      args:
+        LLVM_VERSION:
+        NVIDIA_BASE_IMAGE:
+    depends_on:
+      - xdg

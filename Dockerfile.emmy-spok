@@ -2,6 +2,7 @@
 
 ARG LAYER_NAME
 ARG LAYER_TYPE
+ARG EMACS_DIR
 
 ################################################################################
 FROM xdg AS emmy-spok
@@ -9,8 +10,31 @@ FROM xdg AS emmy-spok
 
 ARG LAYER_NAME
 ARG LAYER_TYPE
+ARG EMACS_DIR
+
 ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
 
-COPY --from=docker-layer \
-    ${LAYER} \
-    ${LAYER}
+COPY --from=gpu-layer / /
+COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
+COPY --from=docker-layer ${LAYER} ${LAYER}
+
+
+
+#   ca-certificates
+#   libxpm4
+#   libpng16-16
+#   libjpeg8
+#   libtiff5
+#   libgif7
+#   librsvg2-2
+#   libwebp7
+#   libgtk-3-0
+#   libgccjit0
+#   libjansson4
+#   libwebkit2gtk-4.0-37
+#   libmagickwand-6.q16-6
+#   libice6
+#   libsm6
+#   curl
+#   git
+#   wget

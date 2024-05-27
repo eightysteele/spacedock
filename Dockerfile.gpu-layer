@@ -1,25 +1,20 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+
+# https://apt.llvm.org
 
 ARG LLVM_VERSION
 ARG NVIDIA_BASE_IMAGE
 
 ################################################################################
-FROM ${NVIDIA_BASE_IMAGE} AS nvidia
+FROM ${NVIDIA_BASE_IMAGE} AS gpu-layer
 ################################################################################
-
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
 ARG LLVM_VERSION
 ARG NVIDIA_BASE_IMAGE
+
+# ------------------------------------------------------------------------------
+# build deps
+#-------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
@@ -43,9 +38,9 @@ apt-get install -y \
 EOF
 
 # ------------------------------------------------------------------------------
-# Build LLVM/Clang.
-# https://apt.llvm.org
+# llvm
 # ------------------------------------------------------------------------------
+
 RUN bash -x <<"EOF"
 set -eu
 bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- ${LLVM_VERSION} all

@@ -25,15 +25,15 @@
 #   git
 #   wget
 
-ARG SPACEDOCK_EMACS_DIR
-ARG SPACEDOCK_EMACS_VERSION
+ARG EMACS_DIR
+ARG EMACS_VERSION
 
 ################################################################################
 FROM xdg AS emacs
 ################################################################################
 
-ARG SPACEDOCK_EMACS_DIR
-ARG SPACEDOCK_EMACS_VERSION
+ARG EMACS_DIR
+ARG EMACS_VERSION
 
 # ------------------------------------------------------------------------------
 # install build dependencies
@@ -81,8 +81,6 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
-export EMACS_DIR=${SPACEDOCK_EMACS_DIR}
-export EMACS_VERSION=${SPACEDOCK_EMACS_VERSION}
 export TZ=America/Los_Angeles
 dir=emacs-${EMACS_VERSION}
 tar=${dir}.tar.gz
