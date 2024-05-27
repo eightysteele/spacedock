@@ -3,7 +3,7 @@ ARG SPACEDOCK_NVM_DIR
 ARG SPACEDOCK_NVM_VERSION
 
 ################################################################################
-FROM xdg AS nvm-dep
+FROM xdg AS nvm
 ################################################################################
 
 ARG SPACEDOCK_NVM_DIR

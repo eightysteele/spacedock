@@ -41,25 +41,45 @@ services:
         condition: service_completed_successfully
 
   # ============================================================================
+  # layers
+
+  docker-layer:
+    image: docker-layer
+    container_name: docker-layer
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.docker-layer
+      tags:
+        - docker-layer
+      args:
+        SPACEDOCK_XDG_HOME: ${SPACEDOCK_XDG_HOME}
+        SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
+        SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
+        SPACEDOCK_XDG_DATA_HOME: ${SPACEDOCK_XDG_DATA_HOME}
+        SPACEDOCK_XDG_CACHE_HOME: ${SPACEDOCK_XDG_CACHE_HOME}
+    env_file:
+     - xdg.env
+
+  # ============================================================================
   # deps
 
   # ----------------------------------------------------------------------------
   # nvm
   # ----------------------------------------------------------------------------
 
-  nvm-dep:
-    image: nvm-dep
-    container_name: nvm-dep
+  nvm:
+    image: nvm
+    container_name: nvm
     #command: tail -f /dev/null
     build:
-      dockerfile: Dockerfile.nvm-dep
+      dockerfile: Dockerfile.nvm
       tags:
-        - nvm-dep
+        - nvm
       args:
         - SPACEDOCK_NVM_DIR=${SPACEDOCK_NVM_DIR}
         - SPACEDOCK_NVM_VERSION=${SPACEDOCK_NVM_VERSION}
     env_file:
-      - nvm-dep.env
+      - nvm.env
     depends_on:
       xdg:
         required: true
@@ -69,21 +89,21 @@ services:
   # dockerfile-language-server
   # ----------------------------------------------------------------------------
 
-  docker-lsp-dep:
-    image: docker-lsp-dep
-    container_name: docker-lsp-dep
+  docker-lsp:
+    image: docker-lsp
+    container_name: docker-lsp
     command: tail -f /dev/null
     build:
-      dockerfile: Dockerfile.docker-lsp-dep
+      dockerfile: Dockerfile.docker-lsp
       tags:
-        - docker-lsp-dep
+        - docker-lsp
       args:
         SPACEDOCK_NVM_DIR: ${SPACEDOCK_NVM_DIR}
         SPACEDOCK_NODE_VERSION: ${SPACEDOCK_NODE_VERSION}
     env_file:
-      - docker-lsp-dep.env
+      - docker-lsp.env
     depends_on:
-      nvm-dep:
+      nvm:
         required: true
         condition: service_completed_successfully
 
@@ -91,14 +111,14 @@ services:
   # haskell
   # ----------------------------------------------------------------------------
 
-  haskell-dep:
-    image: haskell-dep
-    container_name: haskell-dep
+  haskell:
+    image: haskell
+    container_name: haskell
     #command: tail -f /dev/null
     build:
-      dockerfile: Dockerfile.haskell-dep
+      dockerfile: Dockerfile.haskell
       tags:
-        - haskell-dep
+        - haskell
       args:
         SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
         SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
@@ -110,7 +130,7 @@ services:
         BOOTSTRAP_HASKELL_VERBOSE: 1
         BOOTSTRAP_HASKELL_ADJUST_BASHRC: 1
     env_file:
-      - haskell-dep.env
+      - haskell.env
     depends_on:
       xdg:
         required: true
@@ -120,22 +140,22 @@ services:
   # shellcheck
   # ----------------------------------------------------------------------------
 
-  shellcheck-dep:
-    image: shellcheck-dep
-    container_name: shellcheck-dep
+  shellcheck:
+    image: shellcheck
+    container_name: shellcheck
     #command: tail -f /dev/null
     build:
-      dockerfile: Dockerfile.shellcheck-dep
+      dockerfile: Dockerfile.shellcheck
       tags:
-        - shellcheck-dep
+        - shellcheck
       args:
         SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
         SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
         SPACEDOCK_CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
     env_file:
-      - shellcheck-dep.env
+      - shellcheck.env
     depends_on:
-      haskell-dep:
+      haskell:
         required: true
         condition: service_completed_successfully
 
@@ -143,25 +163,25 @@ services:
   # hadolint
   # ----------------------------------------------------------------------------
 
-  hadolint-dep:
-    image: hadolint-dep
-    container_name: hadolint-dep
+  hadolint:
+    image: hadolint
+    container_name: hadolint
     command: tail -f /dev/null
     build:
-      dockerfile: Dockerfile.hadolint-dep
+      dockerfile: Dockerfile.hadolint
       tags:
-        - hadolint-dep
+        - hadolint
       args:
         SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
         SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
         SPACEDOCK_CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
     env_file:
-      - hadolint-dep.env
+      - hadolint.env
     depends_on:
-      haskell-dep:
+      haskell:
         required: true
         condition: service_completed_successfully
-      shellcheck-dep:
+      shellcheck:
         required: true
         condition: service_completed_successfully
 
@@ -320,7 +340,7 @@ services:
         - XDG_CACHE_HOME=${XDG_CACHE_HOME}
         - NVM_DIR=${NVM_DIR}
     depends_on:
-      - hadolint-dep
+      - hadolint
       #- docker-lsp
   project-mlir:
     image: project-mlir

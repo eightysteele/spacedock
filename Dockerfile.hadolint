@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Build hadolint.
+# Builds hadolint binary into $XDG_BIN_HOME.
 # https://github.com/hadolint/hadolint
 
 ARG SPACEDOCK_XDG_BIN_HOME
