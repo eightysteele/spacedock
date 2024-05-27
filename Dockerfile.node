@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:1.7-labs
+
+ARG NVM_DIR
+ARG NVM_VERSION
+ARG NODE_VERSION
+
+################################################################################
+FROM xdg AS node
+################################################################################
+
+ARG NVM_DIR
+ARG NVM_VERSION
+ARG NODE_VERSION
+
+#-------------------------------------------------------------------------------
+# build dependencies
+#-------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+EOF
+
+#-------------------------------------------------------------------------------
+# node
+#-------------------------------------------------------------------------------
+RUN bash -x <<"EOF"
+set -eu
+mkdir ${NVM_DIR} || exit 1
+url=https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh
+curl -o- $url | bash
+source $NVM_DIR/nvm.sh
+nvm install $NODE_VERSION
+nvm use $NODE_VERSION
+nvm alias default $NODE_VERSION
+EOF

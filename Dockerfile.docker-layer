@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1.7-labs
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG NVM_DIR
+ARG CABAL_DIR
+ARG NODE_VERSION
+
+################################################################################
+FROM xdg AS docker-layer
+################################################################################
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG NVM_DIR
+ARG CABAL_DIR
+ARG NODE_VERSION
+
+ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
+
+COPY --from=docker-lsp \
+    ${NVM_DIR}/versions/node/v${NODE_VERSION}/bin/docker-langserver \
+    ${LAYER}/docker-langserver
+
+COPY --from=hadolint \
+    ${CABAL_DIR}/bin/hadolint \
+    ${LAYER}/hadolint

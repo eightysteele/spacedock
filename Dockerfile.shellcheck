@@ -3,18 +3,19 @@
 # Build shellcheck binary in $XDG_BIN_HOME/shellcheck
 # https://github.com/koalaman/shellcheck
 
-ARG SPACEDOCK_XDG_BIN_HOME
-ARG SPACEDOCK_CABAL_DIR
+ARG XDG_BIN_HOME
+ARG CABAL_DIR
 
 ################################################################################
-FROM haskell-dep AS shellcheck-dep
+FROM cabal AS shellcheck
 ################################################################################
 
-ARG SPACEDOCK_XDG_BIN_HOME
-ARG SPACEDOCK_CABAL_DIR
+ARG XDG_BIN_HOME
+ARG CABAL_DIR
+ARG PATH=${XDG_BIN_HOME}:${PATH}
 
 #-------------------------------------------------------------------------------
-# install build dependencies
+# build deps
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -25,8 +26,7 @@ apt-get install -y --no-install-recommends \
     build-essential \
     libgmp-dev \
     zlib1g-dev \
-    git \
-    rsync
+    git
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
@@ -38,13 +38,9 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
-export XDG_BIN_HOME=${SPACEDOCK_XDG_BIN_HOME}
-export PATH=${XDG_BIN_HOME}:${PATH}
-export CABAL_DIR=${SPACEDOCK_CABAL_DIR}
 git clone https://github.com/koalaman/shellcheck.git
 pushd shellcheck
 cabal install ShellCheck
 popd
 rm -rf shellcheck
-rsync -L ${CABAL_DIR}/bin/shellcheck ${XDG_BIN_HOME}/
 EOF

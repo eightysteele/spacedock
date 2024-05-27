@@ -1,0 +1,16 @@
+# syntax=docker/dockerfile:1.7-labs
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+
+################################################################################
+FROM xdg AS emmy-spok
+################################################################################
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
+
+COPY --from=docker-layer \
+    ${LAYER} \
+    ${LAYER}

@@ -5,15 +5,13 @@
 #
 # COPY --from=docker-lsp-dep ${NVM_DIR} ${NVM_DIR}
 
-ARG SPACEDOCK_NVM_DIR
-ARG SPACEDOCK_NODE_VERSION
+ARG NVM_DIR
 
 ################################################################################
-FROM nvm-dep AS docker-lsp
+FROM node AS docker-lsp
 ################################################################################
 
-ARG SPACEDOCK_NVM_DIR
-ARG SPACEDOCK_NODE_VERSION
+ARG NVM_DIR
 
 # ------------------------------------------------------------------------------
 # install build dependencies
@@ -37,12 +35,7 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
-export NVM_DIR=${SPACEDOCK_NVM_DIR}
-export NODE_VERSION=${SPACEDOCK_NODE_VERSION}
 source ${NVM_DIR}/nvm.sh
-nvm install $NODE_VERSION
-nvm use $NODE_VERSION
-nvm alias default $NODE_VERSION
 git clone https://github.com/rcjsuen/dockerfile-language-server.git
 pushd dockerfile-language-server
 npm install

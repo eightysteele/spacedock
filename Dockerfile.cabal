@@ -1,24 +1,33 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds hadolint binary to $CABAL_DIR/bin/hadolint
-# https://github.com/hadolint/hadolint
+# Builds Cabal in the $XDG_CONFIG_HOME/.cabal directory.
+# https://github.com/haskell/ghcup-hs/tree/master/scripts/bootstrap
 
 ARG XDG_BIN_HOME
 ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
 ARG CABAL_DIR
+ARG GHCUP_USE_XDG_DIRS
+ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
+ARG BOOTSTRAP_HASKELL_VERBOSE
+ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
 
 ################################################################################
-FROM shellcheck AS hadolint
+FROM xdg AS cabal
 ################################################################################
 
 ARG XDG_BIN_HOME
 ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
 ARG CABAL_DIR
-
+ARG GHCUP_USE_XDG_DIRS
+ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
+ARG BOOTSTRAP_HASKELL_VERBOSE
+ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
 ARG PATH=${XDG_BIN_HOME}:${PATH}
 
 #-------------------------------------------------------------------------------
-# install build dependencies
+# build deps
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -27,26 +36,24 @@ apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
     build-essential \
-    git
+    libgmp-dev \
+    zlib1g-dev \
+    git \
+    curl
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# build hadolint
+# build cabal
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
-git clone https://github.com/hadolint/hadolint
-pushd hadolint
-mv cabal.project.freeze cabal.project.freeze.backup
+mkdir ${CABAL_DIR} || exit 1
+curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 cabal update
-cabal configure
-cabal update
-cabal build
-cabal install
-popd
-rm -rf hadolint
+cabal install cabal-install
+rm -rf ~/.cache
 EOF
