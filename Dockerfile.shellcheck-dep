@@ -1,35 +1,24 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
-ARG GHCUP_USE_XDG_DIRS
-ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
-ARG BOOTSTRAP_HASKELL_VERBOSE
-ARG BOOTSTRAP_HASKELL_ADJUST_BASHRC
+# Build shellcheck binary in $XDG_BIN_HOME/shellcheck
+# https://github.com/koalaman/shellcheck
+
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_CABAL_DIR
 
 ################################################################################
-FROM haskell-build AS base
+FROM haskell-dep AS shellcheck-dep
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_CABAL_DIR
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# install build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -38,18 +27,24 @@ apt-get install -y --no-install-recommends \
     zlib1g-dev \
     git \
     rsync
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Build shellcheck.
-# https://github.com/koalaman/shellcheck
+# build shellcheck
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
+export XDG_BIN_HOME=${SPACEDOCK_XDG_BIN_HOME}
+export PATH=${XDG_BIN_HOME}:${PATH}
+export CABAL_DIR=${SPACEDOCK_CABAL_DIR}
 git clone https://github.com/koalaman/shellcheck.git
-cd shellcheck
+pushd shellcheck
 cabal install ShellCheck
-rsync -Lr ~/.cabal ${XDG_CONFIG_HOME}/
-rsync -Lr ${XDG_CONFIG_HOME}/.cabal/bin/* $XDG_BIN_HOME/
+popd
+rm -rf shellcheck
+rsync -L ${CABAL_DIR}/bin/shellcheck ${XDG_BIN_HOME}/
 EOF

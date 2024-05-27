@@ -1,52 +1,55 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+
+# Build hadolint.
+# https://github.com/hadolint/hadolint
+
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_XDG_CONFIG_HOME
+ARG SPACEDOCK_CABAL_DIR
 
 ################################################################################
-FROM haskell-build AS base
+FROM shellcheck-dep AS hadolint-dep
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
+ARG SPACEDOCK_XDG_BIN_HOME
+ARG SPACEDOCK_XDG_CONFIG_HOME
+ARG SPACEDOCK_CABAL_DIR
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# install build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
+    ca-certificates \
     build-essential \
-    git \
-    rsync
+    git
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Build hadolint. 
-# https://github.com/hadolint/hadolint
+# build hadolint
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
+export XDG_BIN_HOME=${SPACEDOCK_XDG_BIN_HOME}
+export XDG_CONFIG_HOME=${SPACEDOCK_XDG_CONFIG_HOME}
+export PATH=${XDG_BIN_HOME}:${PATH}
+export CABAL_DIR=${SPACEDOCK_CABAL_DIR}
 git clone https://github.com/hadolint/hadolint
-cd hadolint
+pushd hadolint
 mv cabal.project.freeze cabal.project.freeze.backup
 cabal update
 cabal configure
 cabal update
 cabal build
 cabal install
-cd dist-newstyle/build/x86_64-linux/ghc-9.4.8/hadolint-2.13.0/x/hadolint/build/
-rsync -L hadolint/hadolint ${XDG_BIN_HOME}/
+popd
+rsync -L ${CABAL_DIR}/bin/hadolint ${XDG_BIN_HOME}/
+rm -rf hadolint
 EOF

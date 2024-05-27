@@ -7,6 +7,8 @@
 ARG SPACEDOCK_XDG_BIN_HOME
 ARG SPACEDOCK_XDG_CONFIG_HOME
 ARG SPACEDOCK_XDG_DATA_HOME
+ARG SPACEDOCK_CABAL_DIR
+# these control the ghcup install script:
 ARG GHCUP_USE_XDG_DIRS
 ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
 ARG BOOTSTRAP_HASKELL_VERBOSE
@@ -19,6 +21,8 @@ FROM xdg AS haskell-dep
 ARG SPACEDOCK_XDG_BIN_HOME
 ARG SPACEDOCK_XDG_CONFIG_HOME
 ARG SPACEDOCK_XDG_DATA_HOME
+ARG SPACEDOCK_CABAL_DIR
+# these control the ghcup install script:
 ARG GHCUP_USE_XDG_DIRS
 ARG BOOTSTRAP_HASKELL_NONINTERACTIVE
 ARG BOOTSTRAP_HASKELL_VERBOSE
@@ -37,8 +41,7 @@ apt-get install -y --no-install-recommends \
     libgmp-dev \
     zlib1g-dev \
     git \
-    curl \
-    rsync
+    curl
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
@@ -54,7 +57,7 @@ export XDG_BIN_HOME=${SPACEDOCK_XDG_BIN_HOME}
 export XDG_CONFIG_HOME=${SPACEDOCK_XDG_CONFIG_HOME}
 export XDG_DATA_HOME=${SPACEDOCK_XDG_DATA_HOME}
 export PATH=${SPACEDOCK_XDG_BIN_HOME}:${PATH}
-export CABAL_DIR=${SPACEDOCK_XDG_CONFIG_HOME}/.cabal
+export CABAL_DIR=${SPACEDOCK_CABAL_DIR}
 mkdir ${CABAL_DIR} || exit 1
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 cabal update

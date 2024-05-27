@@ -94,7 +94,7 @@ services:
   haskell-dep:
     image: haskell-dep
     container_name: haskell-dep
-    command: tail -f /dev/null
+    #command: tail -f /dev/null
     build:
       dockerfile: Dockerfile.haskell-dep
       tags:
@@ -103,15 +103,68 @@ services:
         SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
         SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
         SPACEDOCK_XDG_DATA_HOME: ${SPACEDOCK_XDG_DATA_HOME}
+        SPACEDOCK_CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
+        # these control the ghcup install script:
         BOOTSTRAP_HASKELL_NONINTERACTIVE: 1
         GHCUP_USE_XDG_DIRS: 1
-        BOOTSTRAP_HASKELL_CABAL_XDG: 1
         BOOTSTRAP_HASKELL_VERBOSE: 1
         BOOTSTRAP_HASKELL_ADJUST_BASHRC: 1
+    env_file:
+      - haskell-dep.env
     depends_on:
       xdg:
         required: true
         condition: service_completed_successfully
+
+  # ----------------------------------------------------------------------------
+  # shellcheck
+  # ----------------------------------------------------------------------------
+
+  shellcheck-dep:
+    image: shellcheck-dep
+    container_name: shellcheck-dep
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.shellcheck-dep
+      tags:
+        - shellcheck-dep
+      args:
+        SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
+        SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
+        SPACEDOCK_CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
+    env_file:
+      - shellcheck-dep.env
+    depends_on:
+      haskell-dep:
+        required: true
+        condition: service_completed_successfully
+
+  # ----------------------------------------------------------------------------
+  # hadolint
+  # ----------------------------------------------------------------------------
+
+  hadolint-dep:
+    image: hadolint-dep
+    container_name: hadolint-dep
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.hadolint-dep
+      tags:
+        - hadolint-dep
+      args:
+        SPACEDOCK_XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
+        SPACEDOCK_XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
+        SPACEDOCK_CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
+    env_file:
+      - hadolint-dep.env
+    depends_on:
+      haskell-dep:
+        required: true
+        condition: service_completed_successfully
+      shellcheck-dep:
+        required: true
+        condition: service_completed_successfully
+
 
 
   llvm:
@@ -249,39 +302,8 @@ services:
     depends_on:
       - go
 
-  spellcheck:
-    image: spellcheck-build
-    container_name: spellcheck-build
-    #command: tail -f /dev/null
-    build:
-      dockerfile: Dockerfile.spellcheck
-      tags:
-        - spellcheck-build
-      args:
-        - XDG_HOME=${XDG_HOME}
-        - XDG_BIN_HOME=${XDG_BIN_HOME}
-        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-        - XDG_DATA_HOME=${XDG_DATA_HOME}
-        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-    depends_on:
-      - haskell-dep
-  hadolint:
-    image: hadolint-build
-    container_name: hadolint-build
-    #command: tail -f /dev/null
-    build:
-      dockerfile: Dockerfile.hadolint
-      tags:
-        - hadolint-build
-      args:
-        - XDG_HOME=${XDG_HOME}
-        - XDG_BIN_HOME=${XDG_BIN_HOME}
-        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-        - XDG_DATA_HOME=${XDG_DATA_HOME}
-        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-    depends_on:
-      - haskell-dep
-      - spellcheck
+
+
   spacedock-docker:
     image: spacedock-docker
     container_name: spacedock-docker
@@ -298,7 +320,7 @@ services:
         - XDG_CACHE_HOME=${XDG_CACHE_HOME}
         - NVM_DIR=${NVM_DIR}
     depends_on:
-      - hadolint
+      - hadolint-dep
       #- docker-lsp
   project-mlir:
     image: project-mlir
