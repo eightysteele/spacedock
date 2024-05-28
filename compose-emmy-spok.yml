@@ -1,4 +1,4 @@
-# docker compose -f docker-layer-compose.yml -f compose-emacs.yml -f compose-emmy-spok.yml up -d --build emmy-spok
+# docker compose -f compose-common.yml -f compose-emacs.yml -f compose-emmy-spok.yml up -d --build emmy-spok
 # docker compose exec emmy-spok /usr/local/bin/entrypoint.sh
 
 services:
