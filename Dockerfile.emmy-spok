@@ -70,9 +70,9 @@ apt-get install -y --no-install-recommends \
     wget \
     curl \
     fonts-firacode \
-    libxtst6 \  # TODO: fix this in Dockerfile.jdk
-    libcanberra-gtk-module \
+    libxtst6 \
     libcanberra-gtk3-module
+# TODO: add libxtst to Dockerfile.jdk
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
@@ -123,3 +123,16 @@ RUN echo -e "/opt/jdk/lib\n/opt/jdk/lib/server" | tee /etc/ld.so.conf.d/jdk.conf
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # TODO: MAVEN_OPTS point to a volume so that jars/deps persist
+
+# TODO: create user since all files are owned by root
+# TODO: maybe just clone specific repos for the spok and remove shared volume to code
+
+
+# TODO: to open clerk notebooks from container:
+# sudo apt install apt-transport-https curl
+# sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
+# echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main" | sudo tee /etc/apt/sources.list.d/brave-browser-release.list
+# sudo apt update
+# sudo apt install brave-browser
+# sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/brave-browser 200
+# sudo update-alternatives --set x-www-browser /usr/bin/brave-browser

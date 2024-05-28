@@ -60,6 +60,7 @@ services:
       - emmy-spok-emacs-elpa:/opt/xdg/.config/emacs/elpa
       - emmy-spok-emacs-quelpa:/opt/xdg/.config/emacs/quelpa
       - emmy-spok-emacs-org-roam:/opt/xdg/.config/emacs/org-roam
+      - emmy-spok-code:/code
       - /home/eighty/code/github:/home/eighty/code/github
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/emacs1000:/tmp/emacs1000
@@ -340,3 +341,4 @@ volumes:
   emmy-spok-emacs-elpa:
   emmy-spok-emacs-quelpa:
   emmy-spok-emacs-org-roam:
+  emmy-spok-code:

@@ -11,6 +11,17 @@ else
 	yes | emacs --debug-init --daemon
 fi
 
+CODE_DIR="/code"
+if [ ! -d "$CODE_DIR/emmy" ]; then
+	gh repo clone eightysteele/emmy
+fi
+if [ ! -d "$CODE_DIR/spacedock" ]; then
+	gh repo clone eightysteele/spacedock
+fi
+if [ ! -d "$CODE_DIR/spacedock" ]; then
+	gh repo clone eightysteele/Gen.clj
+fi
+
 omd="$XDG_CONFIG_HOME/org-roam-data"
 omdv="$XDG_CONFIG_HOME/emacs/org-roam/"
 if [ -d "$omd" ]; then
