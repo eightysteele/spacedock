@@ -10,9 +10,16 @@ services:
       tags:
         - emmy-spok
       args:
-        LAYER_NAME: docker
-        LAYER_TYPE: tools
+        DOCKER_LAYER_BIN: ${DOCKER_LAYER_BIN}
         EMACS_DIR: ${SPACEDOCK_EMACS_DIR}
+        ORGMODE_TOKEN: ${ORG_TOKEN}
+        ORGMODE_REPO: ${ORG_REPO}
+        GH_USER_NAME: ${GH_USER_NAME}
+        GH_USER_EMAIL: ${GH_USER_EMAIL}
+        XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
+        SPACEMACSDIR: ${SPACEDOCK_XDG_CONFIG_HOME}/spacemacs.d
+        SPACEMACS_D_REPO: ${SPACEMACS_D_REPO}
+        NVM_DIR: ${SPACEDOCK_NVM_DIR}
     depends_on:
       xdg:
         required: true
@@ -26,6 +33,8 @@ services:
       docker-layer:
         required: true
         condition: service_completed_successfully
+    env_file:
+      - emmy-spok.env
     deploy:
       resources:
         reservations:
@@ -33,6 +42,19 @@ services:
             - driver: nvidia
               device_ids: ['0']
               capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    shm_size: 2g
+    privileged: true
+    volumes:
+      - emmy-spok-emacs-cache:/opt/xdg/.config/emacs/.cache
+      - emmy-spok-emacs-eln-cache:/opt/xdg/.config/emacs/eln-cache
+      - emmy-spok-emacs-elpa:/opt/xdg/.config/emacs/elpa
+      - emmy-spok-emacs-quelpa:/opt/xdg/.config/emacs/quelpa
+      - emmy-spok-emacs-org-roam:/opt/xdg/.config/emacs/org-roam
+      - /home/eighty/code/github:/home/eighty/code/github
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/emacs1000:/tmp/emacs1000
 
   # ============================================================================
   # gpu layer
@@ -173,3 +195,14 @@ services:
       xdg:
         required: true
         condition: service_completed_successfully
+
+# ----------------------------------------------------------------------------
+# volumes
+# ----------------------------------------------------------------------------
+
+volumes:
+  emmy-spok-emacs-cache:
+  emmy-spok-emacs-eln-cache:
+  emmy-spok-emacs-elpa:
+  emmy-spok-emacs-quelpa:
+  emmy-spok-emacs-org-roam:

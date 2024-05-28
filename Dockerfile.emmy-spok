@@ -1,40 +1,103 @@
 # syntax=docker/dockerfile:1.7-labs
 
-ARG LAYER_NAME
-ARG LAYER_TYPE
+ARG DOCKER_LAYER_BIN
 ARG EMACS_DIR
+ARG ORGMODE_TOKEN
+ARG GH_USER_NAME
+ARG GH_USER_EMAIL
+ARG XDG_CONFIG_HOME
+ARG SPACEMACS_D_REPO
+ARG NVM_DIR
 
 ################################################################################
 FROM xdg AS emmy-spok
 ################################################################################
 
-ARG LAYER_NAME
-ARG LAYER_TYPE
+ARG DOCKER_LAYER_BIN
 ARG EMACS_DIR
-
-ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
+ARG ORGMODE_TOKEN
+ARG ORGMODE_REPO
+ARG GH_USER_NAME
+ARG GH_USER_EMAIL
+ARG XDG_CONFIG_HOME
+ARG SPACEMACS_D_REPO
+ARG NVM_DIR
 
 COPY --from=gpu-layer / /
+COPY --from=docker-layer ${DOCKER_LAYER_BIN} ${DOCKER_LAYER_BIN}
+COPY --from=docker-layer ${NVM_DIR} ${NVM_DIR}
 COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
-COPY --from=docker-layer ${LAYER} ${LAYER}
 
+#-------------------------------------------------------------------------------
+# runtime dependencies
+#-------------------------------------------------------------------------------
 
+RUN bash -x <<"EOF"
+set -eu
+apt-get update
+apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libxpm4 \
+    libpng16-16 \
+    libjpeg8 \
+    libtiff5 \
+    libgif7 \
+    librsvg2-2 \
+    libwebp7 \
+    libgtk-3-0 \
+    libgccjit0 \
+    libjansson4 \
+    libwebkit2gtk-4.0-37 \
+    libmagickwand-6.q16-6 \
+    libice6 \
+    libsm6 \
+    curl \
+    git \
+    wget \
+    curl \
+    fonts-firacode
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+EOF
 
-#   ca-certificates
-#   libxpm4
-#   libpng16-16
-#   libjpeg8
-#   libtiff5
-#   libgif7
-#   librsvg2-2
-#   libwebp7
-#   libgtk-3-0
-#   libgccjit0
-#   libjansson4
-#   libwebkit2gtk-4.0-37
-#   libmagickwand-6.q16-6
-#   libice6
-#   libsm6
-#   curl
-#   git
-#   wget
+# ------------------------------------------------------------------------------
+# github cli
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+mkdir -p -m 755 /etc/apt/keyrings
+wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+    tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+apt update
+apt install gh -y
+echo ${ORGMODE_TOKEN} | gh auth login --with-token
+git config --global user.name ${GH_USER_NAME}
+git config --global user.email ${GH_USER_EMAIL}
+EOF
+
+# ------------------------------------------------------------------------------
+# clone repos (spacemacs, spacemacs.d, org-data)
+# ------------------------------------------------------------------------------
+
+RUN bash -x <<"EOF"
+set -eu
+cd ${XDG_CONFIG_HOME}
+git clone https://github.com/syl20bnr/spacemacs emacs
+git clone $SPACEMACS_D_REPO
+if gh auth status > /dev/null 2>&1; then
+    git clone https://${ORGMODE_TOKEN}@github.com/${ORGMODE_REPO}.git
+else
+    echo "gh not authenticated"
+exit 1
+fi
+EOF
+
+#-------------------------------------------------------------------------------
+# entrypoint
+#-------------------------------------------------------------------------------
+
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh

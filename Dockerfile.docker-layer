@@ -18,10 +18,5 @@ ARG NODE_VERSION
 
 ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
 
-COPY --from=docker-lsp \
-    ${NVM_DIR}/versions/node/v${NODE_VERSION}/bin/docker-langserver \
-    ${LAYER}/docker-langserver
-
-COPY --from=hadolint \
-    ${CABAL_DIR}/bin/hadolint \
-    ${LAYER}/hadolint
+COPY --from=docker-lsp ${NVM_DIR} ${NVM_DIR}
+COPY --from=hadolint ${CABAL_DIR}/bin/hadolint ${LAYER}/hadolint
