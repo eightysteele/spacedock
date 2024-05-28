@@ -16,6 +16,7 @@ else
 fi
 
 CODE_DIR="/code"
+cd "$CODE_DIR" || exit 1
 if [ ! -d "$CODE_DIR/emmy" ]; then
 	gh repo clone eightysteele/emmy
 fi

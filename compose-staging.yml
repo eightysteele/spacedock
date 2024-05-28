@@ -191,121 +191,121 @@ services:
   #   depends_on:
   #     - xdg
 
-  # clj-kondo:
-  #   image: clj-kondo
-  #   container_name: clj-kondo
-  #   command: tail -f /dev/null
-  #   build:
-  #     dockerfile: Dockerfile.clj-kondo
-  #     tags:
-  #       - clj-kondo
-  #     args:
-  #       - XDG_HOME=${XDG_HOME}
-  #       - XDG_BIN_HOME=${XDG_BIN_HOME}
-  #       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-  #       - XDG_DATA_HOME=${XDG_DATA_HOME}
-  #       - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-  #       - CLJ_KONDO_DIR=${CLJ_KONDO_DIR}
-  #   depends_on:
-  #     - xdg
-  # jdk:
-  #   image: jdk
-  #   container_name: jdk
-  #   command: tail -f /dev/null
-  #   build:
-  #     dockerfile: Dockerfile.jdk
-  #     tags:
-  #       - jdk
-  #     args:
-  #       - XDG_HOME=${XDG_HOME}
-  #       - XDG_BIN_HOME=${XDG_BIN_HOME}
-  #       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-  #       - XDG_DATA_HOME=${XDG_DATA_HOME}
-  #       - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-  #       - JAVA_HOME=${JAVA_HOME}
-  #       - JDK_BINARY_URL=${JDK_BINARY_URL}
-  #   environment:
-  #     - PATH=${PATH_BASE}
-  #   depends_on:
-  #     - xdg
-  # clojure:
-  #   image: clojure
-  #   container_name: clojure
-  #   command: tail -f /dev/null
-  #   build:
-  #     dockerfile: Dockerfile.clojure
-  #     tags:
-  #       - clojure
-  #     args:
-  #       - XDG_HOME=${XDG_HOME}
-  #       - XDG_BIN_HOME=${XDG_BIN_HOME}
-  #       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-  #       - XDG_DATA_HOME=${XDG_DATA_HOME}
-  #       - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-  #       - CLOJURE_DIR=${CLOJURE_DIR}
-  #       - JAVA_HOME=${JAVA_HOME}
-  #   environment:
-  #     - JAVA_HOME=${JAVA_HOME}
-  #     - PATH=${PATH_BASE}
-  #   depends_on:
-  #     - jdk
-  # go:
-  #   image: go
-  #   container_name: go
-  #   command: tail -f /dev/null
-  #   build:
-  #     dockerfile: Dockerfile.go
-  #     tags:
-  #       - go
-  #     args:
-  #       - XDG_HOME=${XDG_HOME}
-  #       - XDG_BIN_HOME=${XDG_BIN_HOME}
-  #       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-  #       - XDG_DATA_HOME=${XDG_DATA_HOME}
-  #       - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-  #       - GO_DIR=${GO_DIR}
-  #       - GO_VERSION=${GO_VERSION}
-  #       - GOROOT=${GOROOT}
-  #       - GOPATH=${GOPATH}
-  #       - GOBIN=${GOBIN}
-  #   environment:
-  #     - PATH=${PATH_BASE}
-  #   depends_on:
-  #     - xdg
-  # joker:
-  #   image: joker
-  #   container_name: joker
-  #   #command: tail -f /dev/null
-  #   build:
-  #     dockerfile: Dockerfile.joker
-  #     tags:
-  #       - joker
-  #     args:
-  #       - XDG_HOME=${XDG_HOME}
-  #       - XDG_BIN_HOME=${XDG_BIN_HOME}
-  #       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-  #       - XDG_DATA_HOME=${XDG_DATA_HOME}
-  #       - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-  #       - GO_DIR=${GO_DIR}
-  #       - GO_VERSION=${GO_VERSION}
-  #       - GOROOT=${GOROOT}
-  #       - GOPATH=${GOPATH}
-  #       - GOBIN=${GOBIN}
-  #       - PATH=${PATH_BASE}
-  #   environment:
-  #     - XDG_HOME=${XDG_HOME}
-  #     - XDG_BIN_HOME=${XDG_BIN_HOME}
-  #     - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
-  #     - XDG_DATA_HOME=${XDG_DATA_HOME}
-  #     - XDG_CACHE_HOME=${XDG_CACHE_HOME}
-  #     - GO_DIR=${GO_DIR}
-  #     - GO_VERSION=${GO_VERSION}
-  #     - GOROOT=${GOROOT}
-  #     - GOPATH=${GOPATH}
-  #     - GOBIN=${GOBIN}
-  #     - PATH=${PATH_BASE}
-  #   depends_on:
-  #     - go
+  clj-kondo:
+    image: clj-kondo
+    container_name: clj-kondo
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.clj-kondo
+      tags:
+        - clj-kondo
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - CLJ_KONDO_DIR=${CLJ_KONDO_DIR}
+    depends_on:
+      - xdg
+  jdk:
+    image: jdk
+    container_name: jdk
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.jdk
+      tags:
+        - jdk
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - JAVA_HOME=${JAVA_HOME}
+        - JDK_BINARY_URL=${JDK_BINARY_URL}
+    environment:
+      - PATH=${PATH_BASE}
+    depends_on:
+      - xdg
+  clojure:
+    image: clojure
+    container_name: clojure
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.clojure
+      tags:
+        - clojure
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - CLOJURE_DIR=${CLOJURE_DIR}
+        - JAVA_HOME=${JAVA_HOME}
+    environment:
+      - JAVA_HOME=${JAVA_HOME}
+      - PATH=${PATH_BASE}
+    depends_on:
+      - jdk
+  go:
+    image: go
+    container_name: go
+    command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.go
+      tags:
+        - go
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - GO_DIR=${GO_DIR}
+        - GO_VERSION=${GO_VERSION}
+        - GOROOT=${GOROOT}
+        - GOPATH=${GOPATH}
+        - GOBIN=${GOBIN}
+    environment:
+      - PATH=${PATH_BASE}
+    depends_on:
+      - xdg
+  joker:
+    image: joker
+    container_name: joker
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.joker
+      tags:
+        - joker
+      args:
+        - XDG_HOME=${XDG_HOME}
+        - XDG_BIN_HOME=${XDG_BIN_HOME}
+        - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+        - XDG_DATA_HOME=${XDG_DATA_HOME}
+        - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+        - GO_DIR=${GO_DIR}
+        - GO_VERSION=${GO_VERSION}
+        - GOROOT=${GOROOT}
+        - GOPATH=${GOPATH}
+        - GOBIN=${GOBIN}
+        - PATH=${PATH_BASE}
+    environment:
+      - XDG_HOME=${XDG_HOME}
+      - XDG_BIN_HOME=${XDG_BIN_HOME}
+      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+      - XDG_DATA_HOME=${XDG_DATA_HOME}
+      - XDG_CACHE_HOME=${XDG_CACHE_HOME}
+      - GO_DIR=${GO_DIR}
+      - GO_VERSION=${GO_VERSION}
+      - GOROOT=${GOROOT}
+      - GOPATH=${GOPATH}
+      - GOBIN=${GOBIN}
+      - PATH=${PATH_BASE}
+    depends_on:
+      - go
 
 
 
