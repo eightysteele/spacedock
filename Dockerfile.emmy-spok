@@ -119,7 +119,7 @@ EOF
 
 # TODO: fix this in Dockerfile.jdk?
 RUN echo -e "/opt/jdk/lib\n/opt/jdk/lib/server" | tee /etc/ld.so.conf.d/jdk.conf && ldconfig
-
+ENV MAVEN_OPTS=/.m2
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # TODO: MAVEN_OPTS point to a volume so that jars/deps persist
