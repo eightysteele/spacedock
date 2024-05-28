@@ -1,9 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+
+# Installs clojure in $CLOJURE_DIR.
+# https://clojure.org/guides/install_clojure#_linux_instructions
 
 ARG CLOJURE_DIR
 ARG JAVA_HOME
@@ -12,20 +10,13 @@ ARG JAVA_HOME
 FROM jdk AS clojure
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
 ARG CLOJURE_DIR
 ARG JAVA_HOME
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
 rm -f /etc/apt/apt.conf.d/docker-clean
@@ -33,11 +24,13 @@ apt-get update
 apt-get install -y --no-install-recommends \
     curl \
     rlwrap
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Install Clojure.
-# https://clojure.org/guides/install_clojure#_linux_instructions
+# clojure
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"

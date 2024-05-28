@@ -1,0 +1,26 @@
+# syntax=docker/dockerfile:1.7-labs
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG CLJ_KONDO_DIR
+ARG JAVA_HOME
+ARG CLOJURE_DIR
+ARG GO_DIR
+
+################################################################################
+FROM xdg AS clojure-layer
+################################################################################
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG CLJ_KONDO_DIR
+ARG JAVA_HOME
+ARG CLOJURE_DIR
+ARG GO_DIR
+
+ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
+
+COPY --from=clj-kondo ${CLJ_KONDO_DIR}/clj-kondo ${LAYER}/clj-kondo
+COPY --from=go ${GO_DIR} ${GO_DIR}
+COPY --from=jdk ${JAVA_HOME} ${JAVA_HOME}
+COPY --from=clojure ${CLOJURE_DIR} ${CLOJURE_DIR}

@@ -1,31 +1,19 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
+
+# Installs clj-kondo to $CLJ_KONDO_DIR: https://github.com/clj-kondo/clj-kondo
 
 ARG CLJ_KONDO_DIR
 
 ################################################################################
-FROM build-xdg AS base
+FROM xdg AS clj-kondo
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
 ARG CLJ_KONDO_DIR
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
 rm -f /etc/apt/apt.conf.d/docker-clean
@@ -35,18 +23,19 @@ apt-get install -y --no-install-recommends \
     build-essential \
     curl \
     unzip
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Build clj-kondo.
-# https://github.com/clj-kondo/clj-kondo
+# clj-kondo
 # ------------------------------------------------------------------------------
+
 RUN bash -x <<"EOF"
 set -eu
 mkdir ${CLJ_KONDO_DIR} && cd ${CLJ_KONDO_DIR} || exit 1
 curl -sLO https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/script/install-clj-kondo
 chmod +x install-clj-kondo
-./install-clj-kondo \
-    --dir ${CLJ_KONDO_DIR} \
-    --download-dir ${CLJ_KONDO_DIR}
+./install-clj-kondo --dir ${CLJ_KONDO_DIR} --download-dir ${CLJ_KONDO_DIR}
 EOF

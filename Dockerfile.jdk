@@ -1,31 +1,21 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
-ARG JDK_DIR
+# Installs the JDK to $JDK_DIR: https://adoptium.net
+
+ARG JAVA_HOME
 ARG JDK_BINARY_URL
 
 ################################################################################
-FROM xdg-build AS jdk
+FROM xdg AS jdk
 ################################################################################
-
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
 ARG JAVA_HOME
 ARG JDK_BINARY_URL
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
 rm -f /etc/apt/apt.conf.d/docker-clean
@@ -38,11 +28,13 @@ apt-get install -y --no-install-recommends \
     gpg-agent
 wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public \
     | gpg --import
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Installs JDK.
-# https://adoptium.net
+# jdk
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"

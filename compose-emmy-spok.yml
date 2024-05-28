@@ -20,6 +20,11 @@ services:
         XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
         SPACEMACS_D_REPO: ${SPACEMACS_D_REPO}
         NVM_DIR: ${SPACEDOCK_NVM_DIR}
+        CLOJURE_LAYER_BIN: ${DOCKER_LAYER_BIN}
+        CLJ_KONDO_DIR: ${CLJ_KONDO_DIR}
+        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
+        CLOJURE_DIR: ${SPACEDOCK_CLOJURE_DIR}
+        GO_DIR: ${SPACEDOCK_GO_DIR}
     depends_on:
       xdg:
         required: true
@@ -31,6 +36,9 @@ services:
         required: true
         condition: service_completed_successfully
       docker-layer:
+        required: true
+        condition: service_completed_successfully
+      clojure-layer:
         required: true
         condition: service_completed_successfully
     env_file:
@@ -73,6 +81,132 @@ services:
         NVIDIA_BASE_IMAGE: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
     depends_on:
       - xdg
+
+  # ============================================================================
+  # clojure layer
+  # ============================================================================
+
+  clojure-layer:
+    image: clojure-layer
+    container_name: clojure-layer
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.clojure-layer
+      tags:
+        - clojure-layer
+      args:
+        LAYER_NAME: clojure
+        LAYER_TYPE: lang
+        CLJ_KONDO_DIR: ${CLJ_KONDO_DIR}
+        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
+        CLOJURE_DIR: ${SPACEDOCK_CLOJURE_DIR}
+        GO_DIR: ${SPACEDOCK_GO_DIR}
+    depends_on:
+      xdg:
+        required: true
+        condition: service_completed_successfully
+      clj-kondo:
+        required: true
+        condition: service_completed_successfully
+      joker:
+        required: true
+        condition: service_completed_successfully
+      clojure:
+        required: true
+        condition: service_completed_successfully
+
+  # ----------------------------------------------------------------------------
+  # clojure layer dependencies
+  # ----------------------------------------------------------------------------
+
+  clj-kondo:
+    image: clj-kondo
+    container_name: clj-kondo
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.clj-kondo
+      tags:
+        - clj-kondo
+      args:
+        CLJ_KONDO_DIR: ${CLJ_KONDO_DIR}
+    depends_on:
+      xdg:
+        required: true
+        condition: service_completed_successfully
+
+  joker:
+    image: joker
+    container_name: joker
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.joker
+      tags:
+        - joker
+      args:
+        - GOROOT=${SPACEDOCK_GOROOT}
+        - GO_PATH=${SPACEDOCK_GO_PATH}
+        - GOBIN=${SPACEDOCK_GOBIN}
+    depends_on:
+      go:
+        required: true
+        condition: service_completed_successfully
+
+  # ----------------------------------------------------------------------------
+  # clojure layer build dependencies
+  # ----------------------------------------------------------------------------
+
+  go:
+    image: go
+    container_name: go
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.go
+      tags:
+        - go
+      args:
+        GO_VERSION: 1.21.6
+        GO_DIR: ${SPACEDOCK_GO_DIR}
+        GOPATH: ${SPACEDOCK_GOPATH}
+    depends_on:
+      xdg:
+        required: true
+        condition: service_completed_successfully
+
+  # ----------------------------------------------------------------------------
+  # clojure layer runtime dependencies
+  # ----------------------------------------------------------------------------
+
+  jdk:
+    image: jdk
+    container_name: jdk
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.jdk
+      tags:
+        - jdk
+      args:
+        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
+        JDK_BINARY_URL: https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz
+    depends_on:
+      xdg:
+        required: true
+        condition: service_completed_successfully
+
+  clojure:
+    image: clojure
+    container_name: clojure
+    #command: tail -f /dev/null
+    build:
+      dockerfile: Dockerfile.clojure
+      tags:
+        - clojure
+      args:
+        CLOJURE_DIR: ${SPACEDOCK_CLOJURE_DIR}
+        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
+    depends_on:
+      jdk:
+        required: true
+        condition: service_completed_successfully
 
   # ============================================================================
   # docker layer

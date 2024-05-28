@@ -1,39 +1,23 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
 
-ARG GO_DIR
+# Installs https://github.com/golang/go in $GO_DIR/goroot. 
+
 ARG GO_VERSION
-ARG GOROOT
+ARG GO_DIR
 ARG GOPATH
-ARG GOBIN
 
 ################################################################################
-FROM build-xdg AS base
+FROM xdg AS go
 ################################################################################
 
-ARG XDG_HOME
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
-ARG XDG_DATA_HOME
-ARG XDG_CACHE_HOME
-
-ARG GO_DIR
 ARG GO_VERSION
-ARG GOROOT
+ARG GO_DIR
 ARG GOPATH
-ARG GOBIN
-
-ENV PATH=${XDG_BIN_HOME}:$PATH
 
 #-------------------------------------------------------------------------------
-# Install dependencies.
+# build dependencies
 # ------------------------------------------------------------------------------
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN bash -x <<"EOF"
 set -eu
 rm -f /etc/apt/apt.conf.d/docker-clean
@@ -42,11 +26,13 @@ apt-get install -y --no-install-recommends \
     ca-certificates \
     build-essential \
     wget
+apt-get clean
+apt-get autoremove -y
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Install Go.
-# https://github.com/hadolint/hadolint
+# go
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"

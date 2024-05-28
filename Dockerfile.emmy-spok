@@ -8,6 +8,10 @@ ARG GH_USER_EMAIL
 ARG XDG_CONFIG_HOME
 ARG SPACEMACS_D_REPO
 ARG NVM_DIR
+ARG CLJ_KONDO_DIR
+ARG JAVA_HOME
+ARG CLOJURE_DIR
+ARG GO_DIR
 
 ################################################################################
 FROM xdg AS emmy-spok
@@ -22,10 +26,20 @@ ARG GH_USER_EMAIL
 ARG XDG_CONFIG_HOME
 ARG SPACEMACS_D_REPO
 ARG NVM_DIR
+ARG CLJ_KONDO_DIR
+ARG JAVA_HOME
+ARG CLOJURE_DIR
+ARG GO_DIR
+
+ARG LAYERS=/spacemacs/layers
 
 COPY --from=gpu-layer / /
-COPY --from=docker-layer ${DOCKER_LAYER_BIN} ${DOCKER_LAYER_BIN}
+COPY --from=docker-layer ${LAYERS}/tools/docker ${LAYERS}/tools/docker
 COPY --from=docker-layer ${NVM_DIR} ${NVM_DIR}
+COPY --from=clojure-layer ${LAYERS}/lang/clojure ${LAYERS}/lang/clojure
+COPY --from=clojure-layer ${GO_DIR} ${GO_DIR}
+COPY --from=clojure-layer ${JAVA_HOME} ${JAVA_HOME}
+COPY --from=clojure-layer ${CLOJURE_DIR} ${CLOJURE_DIR}
 COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
 
 #-------------------------------------------------------------------------------
@@ -55,7 +69,10 @@ apt-get install -y --no-install-recommends \
     git \
     wget \
     curl \
-    fonts-firacode
+    fonts-firacode \
+    libxtst6 \  # TODO: fix this in Dockerfile.jdk
+    libcanberra-gtk-module \
+    libcanberra-gtk3-module
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
@@ -100,4 +117,9 @@ EOF
 # entrypoint
 #-------------------------------------------------------------------------------
 
+# TODO: fix this in Dockerfile.jdk?
+RUN echo -e "/opt/jdk/lib\n/opt/jdk/lib/server" | tee /etc/ld.so.conf.d/jdk.conf && ldconfig
+
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# TODO: MAVEN_OPTS point to a volume so that jars/deps persist
