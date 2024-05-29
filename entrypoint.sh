@@ -5,8 +5,12 @@ export PATH=${SPOK_PATH}:/opt/xdg/.config/nvm/versions/node/v20.13.1/bin:$PATH
 git config --global --add safe.directory "*"
 
 if ! gh auth status; then
-  gh auth login
+	gh auth login
 fi
+
+pushd "$SPACEMACSDIR" || exit 1
+git pull
+popd || exit 1
 
 if pgrep -af "^emacs.*--daemon$" >/dev/null; then
 	echo "emacs daemon is running."

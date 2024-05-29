@@ -61,7 +61,7 @@ services:
       - emmy-spok-emacs-quelpa:/opt/xdg/.config/emacs/quelpa
       - emmy-spok-emacs-org-roam:/opt/xdg/.config/emacs/org-roam
       - emmy-spok-code:/code
-      - emmy-spok-m2:/.m2
+      - emmy-spok-m2:/home/root/.m2
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/emacs1000:/tmp/emacs1000
 
