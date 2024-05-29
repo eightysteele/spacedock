@@ -3,15 +3,13 @@
 # Installs https://github.com/candid82/joker.
 
 ARG GOROOT
-ARG GO_PATH
-ARG GOBIN
+ARG GOBIN=${GOROOT}/bin
 
 ################################################################################
 FROM go AS joker
 ################################################################################
 
 ARG GOROOT
-ARG GO_PATH
 ARG GOBIN
 
 #-------------------------------------------------------------------------------
@@ -20,7 +18,6 @@ ARG GOBIN
 
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -37,7 +34,7 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
-export PATH=${GO_PATH}:$PATH
+export PATH=${GOBIN}:$PATH
 git clone https://github.com/candid82/joker.git
 pushd joker
 ./run.sh --version && go install

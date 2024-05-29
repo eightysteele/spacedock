@@ -1,35 +1,36 @@
 # syntax=docker/dockerfile:1.7-labs
 
-ARG DOCKER_LAYER_BIN
+ARG XDG_HOME
+ARG XDG_CONFIG_HOME=${XDG_HOME}/.config
 ARG EMACS_DIR
-ARG ORGMODE_TOKEN
-ARG GH_USER_NAME
-ARG GH_USER_EMAIL
-ARG XDG_CONFIG_HOME
-ARG SPACEMACS_D_REPO
 ARG NVM_DIR
 ARG CLJ_KONDO_DIR
 ARG JAVA_HOME
 ARG CLOJURE_DIR
-ARG GO_DIR
+ARG GOROOT
+ARG ORGMODE_TOKEN
+ARG ORGMODE_REPO
+ARG GH_USER_NAME
+ARG GH_USER_EMAIL
+ARG SPACEMACS_D_REPO
 
 ################################################################################
 FROM xdg AS emmy-spok
 ################################################################################
 
-ARG DOCKER_LAYER_BIN
-ARG EMACS_DIR
-ARG ORGMODE_TOKEN
-ARG ORGMODE_REPO
-ARG GH_USER_NAME
-ARG GH_USER_EMAIL
+ARG XDG_HOME
 ARG XDG_CONFIG_HOME
-ARG SPACEMACS_D_REPO
+ARG EMACS_DIR
 ARG NVM_DIR
 ARG CLJ_KONDO_DIR
 ARG JAVA_HOME
 ARG CLOJURE_DIR
-ARG GO_DIR
+ARG GOROOT
+ARG ORGMODE_TOKEN
+ARG ORGMODE_REPO
+ARG GH_USER_NAME
+ARG GH_USER_EMAIL
+ARG SPACEMACS_D_REPO
 
 ARG LAYERS=/spacemacs/layers
 
@@ -37,7 +38,7 @@ COPY --from=gpu-layer / /
 COPY --from=docker-layer ${LAYERS}/tools/docker ${LAYERS}/tools/docker
 COPY --from=docker-layer ${NVM_DIR} ${NVM_DIR}
 COPY --from=clojure-layer ${LAYERS}/lang/clojure ${LAYERS}/lang/clojure
-COPY --from=clojure-layer ${GO_DIR} ${GO_DIR}
+COPY --from=clojure-layer ${GOROOT} ${GOROOT}
 COPY --from=clojure-layer ${JAVA_HOME} ${JAVA_HOME}
 COPY --from=clojure-layer ${CLOJURE_DIR} ${CLOJURE_DIR}
 COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
@@ -48,6 +49,12 @@ COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
 
 RUN bash -x <<"EOF"
 set -eu
+dpkg-statoverride --list
+dpkg-statoverride --remove /usr/lib/dbus-1.0/dbus-daemon-launch-helper
+dpkg --configure -a
+apt-get update
+apt-get install -y --no-install-recommends \
+    apt-utils
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -73,14 +80,15 @@ apt-get install -y --no-install-recommends \
     libxtst6 \
     libcanberra-gtk3-module \
     apt-transport-https \
-    xdg-utils
+    xdg-utils \
+    apt-utils
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # -----------------------------------------------------------------------------
-# brave
+# brave (for viewing clerk notebooks!)
 # -----------------------------------------------------------------------------
 RUN bash -x <<"EOF"
 curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg \
@@ -116,7 +124,7 @@ git config --global user.email ${GH_USER_EMAIL}
 EOF
 
 # ------------------------------------------------------------------------------
-# clone repos
+# clone spacemacs, spacemacs.d, orgmode data
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -137,6 +145,5 @@ EOF
 #-------------------------------------------------------------------------------
 
 RUN echo -e "/opt/jdk/lib\n/opt/jdk/lib/server" | tee /etc/ld.so.conf.d/jdk.conf && ldconfig
-ENV MAVEN_OPTS="-Dmaven.repo.local=/.m2"
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 

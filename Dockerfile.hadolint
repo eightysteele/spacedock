@@ -1,24 +1,24 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds hadolint binary to $CABAL_DIR/bin/hadolint
+# Builds hadolint.
+#
+#  - $CABAL_DIR/bin/hadolint
+#
 # https://github.com/hadolint/hadolint
 
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
 ARG CABAL_DIR
+ARG XDG_HOME
+ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
 
 ################################################################################
 FROM shellcheck AS hadolint
 ################################################################################
 
-ARG XDG_BIN_HOME
-ARG XDG_CONFIG_HOME
 ARG CABAL_DIR
-
-ARG PATH=${XDG_BIN_HOME}:${PATH}
+ARG XDG_BIN_HOME
 
 #-------------------------------------------------------------------------------
-# install build dependencies
+# build deps
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -39,6 +39,7 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
+export PATH=${XDG_BIN_HOME}:$PATH
 git clone https://github.com/hadolint/hadolint
 pushd hadolint
 mv cabal.project.freeze cabal.project.freeze.backup

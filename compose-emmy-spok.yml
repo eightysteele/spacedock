@@ -1,48 +1,46 @@
-# docker compose -f compose-common.yml -f compose-emacs.yml -f compose-emmy-spok.yml up -d --build emmy-spok
+# docker compose -f compose-emmy-spok.yml up -d --build emmy-spok
 # docker compose exec emmy-spok /usr/local/bin/entrypoint.sh
 
 services:
   emmy-spok:
     image: emmy-spok
     container_name: emmy-spok
-    command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.emmy-spok
       tags:
         - emmy-spok
       args:
-        DOCKER_LAYER_BIN: ${DOCKER_LAYER_BIN}
-        EMACS_DIR: ${SPACEDOCK_EMACS_DIR}
+        XDG_HOME: ${__XDG_HOME}
+        EMACS_DIR: ${__EMACS_DIR}
+        NVM_DIR: ${__NVM_HOME}
+        CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
+        JAVA_HOMR: ${__JAVA_HOME}
+        CLOJURE_DIR: ${__CLOJURE_DIR}
+        GOROOT: ${__GOROOT}
+        # these are pulled from the user shell environment!
         ORGMODE_TOKEN: ${ORG_TOKEN}
         ORGMODE_REPO: ${ORG_REPO}
         GH_USER_NAME: ${GH_USER_NAME}
         GH_USER_EMAIL: ${GH_USER_EMAIL}
-        XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
         SPACEMACS_D_REPO: ${SPACEMACS_D_REPO}
-        NVM_DIR: ${SPACEDOCK_NVM_DIR}
-        CLOJURE_LAYER_BIN: ${DOCKER_LAYER_BIN}
-        CLJ_KONDO_DIR: ${CLJ_KONDO_DIR}
-        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
-        CLOJURE_DIR: ${SPACEDOCK_CLOJURE_DIR}
-        GO_DIR: ${SPACEDOCK_GO_DIR}
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       emacs:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       gpu-layer:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       docker-layer:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       clojure-layer:
         required: true
-        condition: service_completed_successfully
-    env_file:
-      - emmy-spok.env
+        condition: ${__COMPOSE_CONDITION}
+    env_file: emmy-spok.env
     deploy:
       resources:
         reservations:
@@ -66,13 +64,50 @@ services:
       - /tmp/emacs1000:/tmp/emacs1000
 
   # ============================================================================
+  # xdg
+  # ============================================================================
+
+  xdg:
+    image: xdg
+    container_name: xdg
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.xdg
+      tags:
+        - xdg
+      args:
+        XDG_HOME: ${__XDG_HOME}
+
+  # ============================================================================
+  # emacs
+  # ============================================================================
+
+  emacs:
+    image: emacs
+    container_name: emacs
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.emacs
+      tags:
+        - emacs
+      args:
+        EMACS_DIR: ${__EMACS_DIR}
+        EMACS_VERSION: 29.3
+    env_file:
+      - emacs.env
+    depends_on:
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  # ============================================================================
   # gpu layer
   # ============================================================================
 
   gpu-layer:
     image: gpu-layer
     container_name: gpu-layer
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.gpu-layer
       tags:
@@ -81,7 +116,9 @@ services:
         LLVM_VERSION: 18
         NVIDIA_BASE_IMAGE: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
     depends_on:
-      - xdg
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
 
   # ============================================================================
   # clojure layer
@@ -90,7 +127,7 @@ services:
   clojure-layer:
     image: clojure-layer
     container_name: clojure-layer
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.clojure-layer
       tags:
@@ -98,23 +135,23 @@ services:
       args:
         LAYER_NAME: clojure
         LAYER_TYPE: lang
-        CLJ_KONDO_DIR: ${CLJ_KONDO_DIR}
-        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
-        CLOJURE_DIR: ${SPACEDOCK_CLOJURE_DIR}
-        GO_DIR: ${SPACEDOCK_GO_DIR}
+        CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
+        JAVA_HOME: ${__JAVA_HOME}
+        CLOJURE_DIR: ${__CLOJURE_DIR}
+        GOROOT: ${__GOROOT} 
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       clj-kondo:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       joker:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       clojure:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   # ----------------------------------------------------------------------------
   # clojure layer dependencies
@@ -123,34 +160,32 @@ services:
   clj-kondo:
     image: clj-kondo
     container_name: clj-kondo
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.clj-kondo
       tags:
         - clj-kondo
       args:
-        CLJ_KONDO_DIR: ${CLJ_KONDO_DIR}
+        CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   joker:
     image: joker
     container_name: joker
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.joker
       tags:
         - joker
       args:
-        - GOROOT=${SPACEDOCK_GOROOT}
-        - GO_PATH=${SPACEDOCK_GO_PATH}
-        - GOBIN=${SPACEDOCK_GOBIN}
+        GOROOT: ${__GOROOT}
     depends_on:
       go:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   # ----------------------------------------------------------------------------
   # clojure layer build dependencies
@@ -159,19 +194,18 @@ services:
   go:
     image: go
     container_name: go
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.go
       tags:
         - go
       args:
         GO_VERSION: 1.21.6
-        GO_DIR: ${SPACEDOCK_GO_DIR}
-        GOPATH: ${SPACEDOCK_GOPATH}
+        GOROOT: ${__GOROOT}
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   # ----------------------------------------------------------------------------
   # clojure layer runtime dependencies
@@ -180,34 +214,36 @@ services:
   jdk:
     image: jdk
     container_name: jdk
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.jdk
       tags:
         - jdk
       args:
-        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
-        JDK_BINARY_URL: https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.3%2B9/OpenJDK21U-jre_x64_linux_hotspot_21.0.3_9.tar.gz
+        JAVA_HOME: ${__JAVA_HOME}
+        JDK_MAJOR_VERSION: 21
+        JDK_MINOR_VERSION: 0.3
+        JDK_BUILD_NUMBER: 9
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   clojure:
     image: clojure
     container_name: clojure
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.clojure
       tags:
         - clojure
       args:
-        CLOJURE_DIR: ${SPACEDOCK_CLOJURE_DIR}
-        JAVA_HOME: ${SPACEDOCK_JAVA_HOME}
+        CLOJURE_DIR: ${__CLOJURE_DIR}
+        JAVA_HOME: ${__JAVA_HOME}
     depends_on:
       jdk:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   # ============================================================================
   # docker layer
@@ -216,7 +252,7 @@ services:
   docker-layer:
     image: docker-layer
     container_name: docker-layer
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.docker-layer
       tags:
@@ -224,20 +260,18 @@ services:
       args:
         LAYER_NAME: docker
         LAYER_TYPE: tools
-        NVM_DIR: ${SPACEDOCK_NVM_DIR}
-        CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
-        NVM_VERSION: 0.39.3
-        NODE_VERSION: 20.13.1
+        NVM_DIR: ${__NVM_HOME}
+        CABAL_DIR: ${__CABAL_HOME}
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       docker-lsp:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
       hadolint:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   # ----------------------------------------------------------------------------
   # docker layer dependencies
@@ -246,33 +280,33 @@ services:
   docker-lsp:
     image: docker-lsp
     container_name: docker-lsp
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.docker-lsp
       tags:
         - docker-lsp
       args:
-        NVM_DIR: ${SPACEDOCK_NVM_DIR}
+        NVM_DIR: ${__NVM_HOME}
     depends_on:
       node:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
+
   hadolint:
     image: hadolint
     container_name: hadolint
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.hadolint
       tags:
         - hadolint
       args:
-        XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
-        XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
-        CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
+        CABAL_DIR: ${__CABAL_HOME}
+        XDG_HOME: ${__XDG_HOME}
     depends_on:
       shellcheck:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
   # ----------------------------------------------------------------------------
   # docker layer build dependencies
@@ -281,55 +315,51 @@ services:
   node:
     image: node
     container_name: node
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.node
       tags:
         - node
       args:
-        NVM_DIR: ${SPACEDOCK_NVM_DIR}
+        NVM_DIR: ${__NVM_HOME}
         NVM_VERSION: 0.39.3
         NODE_VERSION: 20.13.1
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
+
   shellcheck:
     image: shellcheck
     container_name: shellcheck
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.shellcheck
       tags:
         - shellcheck
       args:
-        XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
-        CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
+        CABAL_DIR: ${__CABAL_HOME}
+        XDG_HOME: ${__XDG_HOME}
     depends_on:
       cabal:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
+
   cabal:
     image: cabal
     container_name: cabal
-    #command: tail -f /dev/null
+    command: ${__COMPOSE_COMMAND}
     build:
       dockerfile: Dockerfile.cabal
       tags:
         - cabal
       args:
-        XDG_BIN_HOME: ${SPACEDOCK_XDG_BIN_HOME}
-        XDG_CONFIG_HOME: ${SPACEDOCK_XDG_CONFIG_HOME}
-        XDG_DATA_HOME: ${SPACEDOCK_XDG_DATA_HOME}
-        CABAL_DIR: ${SPACEDOCK_CABAL_DIR}
-        BOOTSTRAP_HASKELL_NONINTERACTIVE: 1
-        GHCUP_USE_XDG_DIRS: 1
-        BOOTSTRAP_HASKELL_VERBOSE: 1
-        BOOTSTRAP_HASKELL_ADJUST_BASHRC: 1
+        CABAL_DIR: ${__CABAL_HOME}
+        XDG_HOME: ${__XDG_HOME}
     depends_on:
       xdg:
         required: true
-        condition: service_completed_successfully
+        condition: ${__COMPOSE_CONDITION}
 
 # ----------------------------------------------------------------------------
 # volumes

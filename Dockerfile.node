@@ -1,5 +1,11 @@
 # syntax=docker/dockerfile:1.7-labs
 
+# Installs nvm and node.
+#
+#  - source $NVM_DIR/nvm.sh for the nvm binary
+#
+# https://github.com/nvm-sh/nvm
+
 ARG NVM_DIR
 ARG NVM_VERSION
 ARG NODE_VERSION

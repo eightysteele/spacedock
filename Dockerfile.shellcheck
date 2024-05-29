@@ -1,18 +1,22 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Build shellcheck binary in $XDG_BIN_HOME/shellcheck
+# Build shellcheck.
+#
+#  - $CABAL_DIR/bin/shellcheck
+#
 # https://github.com/koalaman/shellcheck
 
-ARG XDG_BIN_HOME
 ARG CABAL_DIR
+ARG XDG_HOME
+ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
 
 ################################################################################
 FROM cabal AS shellcheck
 ################################################################################
 
-ARG XDG_BIN_HOME
 ARG CABAL_DIR
-ARG PATH=${XDG_BIN_HOME}:${PATH}
+ARG XDG_HOME
+ARG XDG_BIN_HOME
 
 #-------------------------------------------------------------------------------
 # build deps
@@ -24,8 +28,6 @@ apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
     build-essential \
-    libgmp-dev \
-    zlib1g-dev \
     git
 apt-get clean
 apt-get autoremove -y
@@ -38,6 +40,7 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
+export PATH=${XDG_BIN_HOME}:$PATH
 git clone https://github.com/koalaman/shellcheck.git
 pushd shellcheck
 cabal install ShellCheck

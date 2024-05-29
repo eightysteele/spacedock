@@ -1,9 +1,10 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds the dockerfile-language-server:
-# https://github.com/rcjsuen/dockerfile-language-server
+# Builds dockerfile-language-server.
 #
 # COPY --from=docker-lsp-dep ${NVM_DIR} ${NVM_DIR}
+#
+# https://github.com/rcjsuen/dockerfile-language-server
 
 ARG NVM_DIR
 
@@ -19,7 +20,6 @@ ARG NVM_DIR
 
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \

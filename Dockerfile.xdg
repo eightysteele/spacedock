@@ -1,31 +1,31 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG SPACEDOCK_XDG_HOME
-ARG SPACEDOCK_XDG_BIN_HOME
-ARG SPACEDOCK_XDG_CONFIG_HOME
-ARG SPACEDOCK_XDG_DATA_HOME
-ARG SPACEDOCK_XDG_CACHE_HOME
+ARG XDG_HOME
+ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
+ARG XDG_CONFIG_HOME=${XDG_HOME}/.config
+ARG XDG_DATA_HOME=${XDG_HOME}/.local/share
+ARG XDG_CACHE_HOME=${XDG_HOME}/.cache
 
 ################################################################################
 FROM ubuntu:jammy AS xdg
 ################################################################################
 
-ARG SPACEDOCK_XDG_HOME
-ARG SPACEDOCK_XDG_BIN_HOME
-ARG SPACEDOCK_XDG_CONFIG_HOME
-ARG SPACEDOCK_XDG_DATA_HOME
-ARG SPACEDOCK_XDG_CACHE_HOME
+ARG XDG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
 
 # ------------------------------------------------------------------------------
-# Setup XDG filesystem.
+# setup XDG filesystem.
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-0.6.html
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
 mkdir -p \
-    $SPACEDOCK_XDG_HOME \
-    $SPACEDOCK_XDG_CONFIG_HOME \
-    $SPACEDOCK_XDG_DATA_HOME \
-    $SPACEDOCK_XDG_CACHE_HOME \
-    $SPACEDOCK_XDG_BIN_HOME
+    $XDG_HOME \
+    $XDG_CONFIG_HOME \
+    $XDG_DATA_HOME \
+    $XDG_CACHE_HOME \
+    $XDG_BIN_HOME
 EOF

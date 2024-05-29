@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs clj-kondo to $CLJ_KONDO_DIR: https://github.com/clj-kondo/clj-kondo
+# Installs clj-kondo to $CLJ_KONDO_DIR/clj-kondo.
+# https://github.com/clj-kondo/clj-kondo
 
 ARG CLJ_KONDO_DIR
 
@@ -38,4 +39,5 @@ mkdir ${CLJ_KONDO_DIR} && cd ${CLJ_KONDO_DIR} || exit 1
 curl -sLO https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/script/install-clj-kondo
 chmod +x install-clj-kondo
 ./install-clj-kondo --dir ${CLJ_KONDO_DIR} --download-dir ${CLJ_KONDO_DIR}
+rm -rf install-clj-kondo
 EOF

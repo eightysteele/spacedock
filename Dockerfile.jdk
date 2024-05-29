@@ -3,14 +3,18 @@
 # Installs the JDK to $JDK_DIR: https://adoptium.net
 
 ARG JAVA_HOME
-ARG JDK_BINARY_URL
+ARG JDK_MAJOR_VERSION
+ARG JDK_MINOR_VERSION
+ARG JDK_BUILD_NUMBER
 
 ################################################################################
 FROM xdg AS jdk
 ################################################################################
 
 ARG JAVA_HOME
-ARG JDK_BINARY_URL
+ARG JDK_MAJOR_VERSION
+ARG JDK_MINOR_VERSION
+ARG JDK_BUILD_NUMBER
 
 #-------------------------------------------------------------------------------
 # build dependencies
@@ -18,7 +22,6 @@ ARG JDK_BINARY_URL
 
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -40,12 +43,15 @@ EOF
 
 RUN bash -x <<"EOF"
 set -eu
-mkdir -p ${JAVA_HOME} && cd ${JAVA_HOME} || exit
-url=$(dirname "$JDK_BINARY_URL")
-tarf=$(basename "$JDK_BINARY_URL")
+base="https://github.com/adoptium/temurin${JDK_MAJOR_VERSION}-binaries/releases/download"
+vpath="/jdk-${JDK_MAJOR_VERSION}.${JDK_MINOR_VERSION}%2B${JDK_BUILD_NUMBER}/"
+url="$base$vpath"
+tarf="OpenJDK${JDK_MAJOR_VERSION}U-jre_x64_linux_hotspot_"
+tarf="${tarf}${JDK_MAJOR_VERSION}.${JDK_MINOR_VERSION}_${JDK_BUILD_NUMBER}.tar.gz"
 sigf=$tarf.sig
 taru=$url/$tarf
 sigu=$url/$sigf
+mkdir -p ${JAVA_HOME} && cd ${JAVA_HOME} || exit
 wget $taru
 wget $sigu
 if ! gpg --verify $sigf $tarf; then

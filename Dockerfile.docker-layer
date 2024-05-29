@@ -4,7 +4,6 @@ ARG LAYER_NAME
 ARG LAYER_TYPE
 ARG NVM_DIR
 ARG CABAL_DIR
-ARG NODE_VERSION
 
 ################################################################################
 FROM xdg AS docker-layer
@@ -14,7 +13,6 @@ ARG LAYER_NAME
 ARG LAYER_TYPE
 ARG NVM_DIR
 ARG CABAL_DIR
-ARG NODE_VERSION
 
 ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
 

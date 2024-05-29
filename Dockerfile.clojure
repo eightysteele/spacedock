@@ -19,7 +19,6 @@ ARG JAVA_HOME
 
 RUN bash -x <<"EOF"
 set -eu
-rm -f /etc/apt/apt.conf.d/docker-clean
 apt-get update
 apt-get install -y --no-install-recommends \
     curl \
