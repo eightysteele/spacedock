@@ -1,0 +1,9 @@
+# syntax=docker/dockerfile:1.7-labs
+
+# https://gitlab.com/nvidia/container-images/cuda/blob/master/dist/12.4.1/ubuntu2204/devel/Dockerfile
+
+ARG CUDA_BASE_IMAGE
+
+################################################################################
+FROM ${CUDA_BASE_IMAGE} AS cuda
+################################################################################

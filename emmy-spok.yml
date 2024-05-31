@@ -18,6 +18,9 @@ services:
         JAVA_HOMR: ${__JAVA_HOME}
         CLOJURE_DIR: ${__CLOJURE_DIR}
         GOROOT: ${__GOROOT}
+        CABAL_DIR: ${__CABAL_HOME}
+        PYTHON_HOME: ${__PYTHON_HOME}
+        NODE_VERSION: 20.13.10
         # these are pulled from the user shell environment!
         ORGMODE_TOKEN: ${ORG_TOKEN}
         ORGMODE_REPO: ${ORG_REPO}
@@ -93,8 +96,6 @@ services:
       args:
         EMACS_DIR: ${__EMACS_DIR}
         EMACS_VERSION: 29.3
-    env_file:
-      - emacs.env
     depends_on:
       xdg:
         required: true
@@ -103,7 +104,8 @@ services:
   # ============================================================================
   # gpu layer
   # ============================================================================
-
+  # nvidia/cuda:12.4.1-devel-ubuntu22.04
+  # https://gitlab.com/nvidia/container-images/cuda/-/tree/master/dist/12.4.1/ubuntu2204
   gpu-layer:
     image: gpu-layer
     container_name: gpu-layer
@@ -114,11 +116,82 @@ services:
         - gpu-layer
       args:
         LLVM_VERSION: 18
-        NVIDIA_BASE_IMAGE: nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+        NVIDIA_BASE_IMAGE: nvcr.io/nvidia/cuda:12.4.1-devel-ubuntu20.04
     depends_on:
       xdg:
         required: true
         condition: ${__COMPOSE_CONDITION}
+      cuda:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      nsight-compute:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      llvm:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      mlir:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  cuda:
+    image: cuda
+    container_name: cuda
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.cuda
+      tags:
+        - cuda
+      args:
+        CUDA_BASE_IMAGE: nvcr.io/nvidia/cuda:12.4.1-devel-ubuntu20.04
+    depends_on:
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  mlir:
+    image: mlir
+    container_name: mlir
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.mlir
+      tags:
+        - mlir
+      args:
+        LLVM_VERSION: 18
+    depends_on:
+      llvm:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  llvm:
+    image: llvm
+    container_name: llvm
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.llvm
+      tags:
+        - llvm
+      args:
+        LLVM_VERSION: 18
+    depends_on:
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  nsight-compute:
+    image: nsight-compute
+    container_name: nsight-compute
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.nsight-compute
+      tags:
+        - nsight-compute
+    depends_on:
+      cuda:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
 
   # ============================================================================
   # clojure layer
@@ -138,7 +211,7 @@ services:
         CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
         JAVA_HOME: ${__JAVA_HOME}
         CLOJURE_DIR: ${__CLOJURE_DIR}
-        GOROOT: ${__GOROOT} 
+        GOROOT: ${__GOROOT}
     depends_on:
       xdg:
         required: true
@@ -356,6 +429,119 @@ services:
       args:
         CABAL_DIR: ${__CABAL_HOME}
         XDG_HOME: ${__XDG_HOME}
+    depends_on:
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  # ============================================================================
+  # shell-scripts layer
+  # ============================================================================
+
+  shell-scripts-layer:
+    image: shell-scripts-layer
+    container_name: shell-scripts-layer
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.shell-scripts-layer
+      tags:
+        - shell-scripts-layer
+      args:
+        LAYER_NAME: shell-scripts
+        LAYER_TYPE: lang
+        NVM_DIR: ${__NVM_HOME}
+        CABAL_DIR: ${__CABAL_HOME}
+        PYTHON_HOME: ${__PYTHON_HOME}
+        GOROOT: ${__GOROOT}
+    depends_on:
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      bashate:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      shellcheck:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      shfmt:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      bash-language-server:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  # ----------------------------------------------------------------------------
+  # shell-scripts layer dependencies
+  # ----------------------------------------------------------------------------
+
+  bash-language-server:
+    image: bash-language-server
+    container_name: bash-language-server
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.bash-language-server
+      tags:
+        - bash-language-server
+      args:
+        NVM_DIR: ${__NVM_HOME}
+    depends_on:
+      node:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      shellcheck:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      bashate:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  bashate:
+    image: bashate
+    container_name: bashate
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.bashate
+      tags:
+        - bashate
+      args:
+        PYTHON_HOME: ${__PYTHON_HOME}
+    depends_on:
+      xdg:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+      python:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+
+  shfmt:
+    image: shfmt
+    container_name: shfmt
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.shfmt
+      tags:
+        - shfmt
+      args:
+        GOROOT: ${__GOROOT}
+    depends_on:
+      go:
+        required: true
+        condition: ${__COMPOSE_CONDITION}
+
+  python:
+    image: python
+    container_name: python
+    command: ${__COMPOSE_COMMAND}
+    build:
+      dockerfile: Dockerfile.python
+      tags:
+        - python
+      args:
+        PYTHON_HOME: ${__PYTHON_HOME}
+        PYTHON_MAJOR_VERSION: 3
+        PYTHON_MINOR_VERSION: 12
+        PYTHON_BUILD_NUMBER: 3
     depends_on:
       xdg:
         required: true

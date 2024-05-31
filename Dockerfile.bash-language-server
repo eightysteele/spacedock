@@ -1,21 +1,18 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds dockerfile-language-server.
-#
-# COPY --from=docker-lsp ${NVM_DIR} ${NVM_DIR}
-#
-# https://github.com/rcjsuen/dockerfile-language-server
+# Installs https://github.com/bash-lsp/bash-language-server
+# COPY --from=bash-language-server ${NVM_DIR} ${NVM_DIR}
 
 ARG NVM_DIR
 
 ################################################################################
-FROM node AS docker-lsp
+FROM node AS bash-language-server
 ################################################################################
 
 ARG NVM_DIR
 
-# ------------------------------------------------------------------------------
-# install build dependencies
+#-------------------------------------------------------------------------------
+# build dependencies
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -23,6 +20,7 @@ set -eu
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
+    build-essential \
     git
 apt-get clean
 apt-get autoremove -y
@@ -30,19 +28,11 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# build dockerfile-language-server
+# bash-language-server
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
 source ${NVM_DIR}/nvm.sh
-git clone https://github.com/rcjsuen/dockerfile-language-server.git
-pushd dockerfile-language-server
-npm install
-npm audit fix
-npm run build
-npm test
-npm install -g dockerfile-language-server-nodejs
-popd
-rm -rf dockerfile-language-server
+npm i -g bash-language-server
 EOF

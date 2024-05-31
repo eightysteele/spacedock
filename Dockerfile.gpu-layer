@@ -1,91 +1,11 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# https://apt.llvm.org
-
-ARG LLVM_VERSION
-ARG NVIDIA_BASE_IMAGE
-
 ################################################################################
-FROM ${NVIDIA_BASE_IMAGE} AS gpu-layer
+FROM xdg AS gpu-layer
 ################################################################################
 
-ARG LLVM_VERSION
-ARG NVIDIA_BASE_IMAGE
-
-# ------------------------------------------------------------------------------
-# build deps
-#-------------------------------------------------------------------------------
-
-RUN bash -x <<"EOF"
-set -eu
-apt-get update
-apt-get install -y \
-    build-essential \
-    lsb-release \
-    wget \
-    gpg \
-    checkinstall \
-    cmake \
-    curl \
-    git\
-    gnupg \
-    liblzma-dev \
-    python-is-python3 \
-    python3-pip \
-    rsync \
-    jq \
-    software-properties-common
-EOF
-
-# ------------------------------------------------------------------------------
-# llvm
-# ------------------------------------------------------------------------------
-
-RUN bash -x <<"EOF"
-set -eu
-bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" -- ${LLVM_VERSION} all
-apt-get install -y \
-    libmlir-${LLVM_VERSION}-dev \
-    mlir-${LLVM_VERSION}-tools
-apt-get remove -y software-properties-common lsb-release
-apt-get autoremove -y
-update-alternatives --verbose \
-  --install /usr/bin/clang          clang          /usr/lib/llvm-${LLVM_VERSION}/bin/clang 100 \
-  --slave   /usr/bin/asan_symbolize asan_symbolize /usr/bin/asan_symbolize-${LLVM_VERSION} \
-  --slave   /usr/bin/clang++        clang++        /usr/lib/llvm-${LLVM_VERSION}/bin/clang++ \
-  --slave   /usr/bin/ld.lld         ld.lld         /usr/lib/llvm-${LLVM_VERSION}/bin/lld \
-  --slave   /usr/bin/lld            lld            /usr/lib/llvm-${LLVM_VERSION}/bin/lld \
-  --slave   /usr/bin/lld-link       lld-link       /usr/lib/llvm-${LLVM_VERSION}/bin/lld \
-  --slave   /usr/bin/wasm-ld        wasm-ld        /usr/lib/llvm-${LLVM_VERSION}/bin/lld \
-  --slave   /usr/bin/mlir-cat                       mlir-cat                       /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-cat \
-  --slave   /usr/bin/mlir-cpu-runner                mlir-cpu-runner                /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-cpu-runner \
-  --slave   /usr/bin/mlir-linalg-ods-yaml-gen       mlir-linalg-ods-yaml-gen       /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-linalg-ods-yaml-gen \
-  --slave   /usr/bin/mlir-lsp-server                mlir-lsp-server                /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-lsp-server \
-  --slave   /usr/bin/mlir-minimal-opt               mlir-minimal-opt               /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-minimal-opt \
-  --slave   /usr/bin/mlir-minimal-opt-canonicalize  mlir-minimal-opt-canonicalize  /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-minimal-opt-canonicalize \
-  --slave   /usr/bin/mlir-opt                       mlir-opt                       /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-opt \
-  --slave   /usr/bin/mlir-pdll                      mlir-pdll                      /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-pdll \
-  --slave   /usr/bin/mlir-pdll-lsp-server           mlir-pdll-lsp-server           /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-pdll-lsp-server \
-  --slave   /usr/bin/mlir-query                     mlir-query                     /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-query \
-  --slave   /usr/bin/mlir-reduce                    mlir-reduce                    /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-reduce \
-  --slave   /usr/bin/mlir-tblgen                    mlir-tblgen                    /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-tblgen \
-  --slave   /usr/bin/mlir-translate                 mlir-translate                 /usr/lib/llvm-${LLVM_VERSION}/bin/mlir-translate \
-  --slave   /usr/bin/clang-tblgen                   clang-tblgen                   /usr/lib/llvm-${LLVM_VERSION}/bin/clang-tblgen \
-  --slave   /usr/bin/llvm-tblgen                    llvm-tblgen                    /usr/lib/llvm-${LLVM_VERSION}/bin/llvm-tblgen \
-  --slave   /usr/bin/tblgen-lsp-server              tblgen-lsp-server              /usr/lib/llvm-${LLVM_VERSION}/bin/tblgen-lsp-server \
-  --slave   /usr/bin/tblgen-to-irdl                 tblgen-to-irdl                 /usr/lib/llvm-${LLVM_VERSION}/bin/tblgen-to-irdl
-# Make sure that any later attempt to install `clang` or `lld` will fail.
-cat >/etc/apt/preferences.d/no-unversioned-clang-lld <<EOL
-  Package: clang
-  Pin: release *
-  Pin-Priority: -1
-  Package: lld
-  Pin: release *
-  Pin-Priority: -1
-EOL
-apt-get clean
-rm -rf /var/lib/apt/lists/*
-EOF
-
-
+COPY --from=cuda / /
+COPY --from=nsight-compute / /
+COPY --from=llvm / /
+COPY --from=mlir / /
 

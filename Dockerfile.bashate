@@ -1,21 +1,13 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds dockerfile-language-server.
-#
-# COPY --from=docker-lsp ${NVM_DIR} ${NVM_DIR}
-#
-# https://github.com/rcjsuen/dockerfile-language-server
-
-ARG NVM_DIR
+# Builds https://github.com/openstack/bashate into $PYTHON_HOME/bin/bashate
 
 ################################################################################
-FROM node AS docker-lsp
+FROM python AS bashate
 ################################################################################
-
-ARG NVM_DIR
 
 # ------------------------------------------------------------------------------
-# install build dependencies
+# build deps
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -30,19 +22,15 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# build dockerfile-language-server
+# bashate
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
-source ${NVM_DIR}/nvm.sh
-git clone https://github.com/rcjsuen/dockerfile-language-server.git
-pushd dockerfile-language-server
-npm install
-npm audit fix
-npm run build
-npm test
-npm install -g dockerfile-language-server-nodejs
+git clone https://github.com/openstack/bashate.git
+pushd bashate
+pip3 install .
 popd
-rm -rf dockerfile-language-server
+rm -rf bashate
+echo ""
 EOF

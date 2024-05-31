@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1.7-labs
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG NVM_DIR
+ARG CABAL_DIR
+ARG GOROOT
+
+################################################################################
+FROM xdg AS shell-scripts-layer
+################################################################################
+
+ARG LAYER_NAME
+ARG LAYER_TYPE
+ARG NVM_DIR
+ARG CABAL_DIR
+ARG GOROOT
+
+ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
+
+COPY --from=shellcheck ${CABAL_DIR}/bin/shellcheck ${CABAL_DIR}/bin/shellcheck
+COPY --from=shfmt ${GOROOT} ${GOROOT}
+COPY --from=bash-language-server ${NVM_DIR} ${NVM_DIR}
+COPY --from=bashate /usr/local/bin/bashate /usr/local/bin/bashate
+

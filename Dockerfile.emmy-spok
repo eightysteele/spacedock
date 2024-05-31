@@ -7,6 +7,9 @@ ARG NVM_DIR
 ARG CLJ_KONDO_DIR
 ARG JAVA_HOME
 ARG CLOJURE_DIR
+ARG CABAL_DIR
+ARG PYTHON_HOME
+ARG NODE_VERSION
 ARG GOROOT
 ARG ORGMODE_TOKEN
 ARG ORGMODE_REPO
@@ -25,6 +28,9 @@ ARG NVM_DIR
 ARG CLJ_KONDO_DIR
 ARG JAVA_HOME
 ARG CLOJURE_DIR
+ARG CABAL_DIR
+ARG PYTHON_HOME
+ARG NODE_VERSION
 ARG GOROOT
 ARG ORGMODE_TOKEN
 ARG ORGMODE_REPO
@@ -33,15 +39,27 @@ ARG GH_USER_EMAIL
 ARG SPACEMACS_D_REPO
 
 ARG LAYERS=/spacemacs/layers
+ARG NODE_BIN=${NVM_DIR}/versions/node/v20.13.1/bin
 
 COPY --from=gpu-layer / /
+
 COPY --from=docker-layer ${LAYERS}/tools/docker ${LAYERS}/tools/docker
 COPY --from=docker-layer ${NVM_DIR} ${NVM_DIR}
+
 COPY --from=clojure-layer ${LAYERS}/lang/clojure ${LAYERS}/lang/clojure
 COPY --from=clojure-layer ${GOROOT} ${GOROOT}
 COPY --from=clojure-layer ${JAVA_HOME} ${JAVA_HOME}
 COPY --from=clojure-layer ${CLOJURE_DIR} ${CLOJURE_DIR}
+
+COPY --from=shell-scripts-layer \
+    ${NODE_BIN}/bash-language-server \
+    ${NODE_BIN}/bash-language-server
+COPY --from=shell-scripts-layer ${GOROOT}/bin/shfmt ${GOROOT}/bin/shfmt
+COPY --from=shell-scripts-layer ${CABAL_DIR} ${CABAL_DIR}
+COPY --from=shell-scripts-layer /usr/local/bin/bashate /usr/local/bin/bashate
+
 COPY --from=emacs ${EMACS_DIR} ${EMACS_DIR}
+
 
 #-------------------------------------------------------------------------------
 # runtime dependencies
