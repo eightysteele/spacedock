@@ -2,69 +2,69 @@
 # docker compose exec emmy-spok /usr/local/bin/entrypoint.sh
 
 services:
-  emmy-spok:
-    image: emmy-spok
-    container_name: emmy-spok
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.emmy-spok
-      tags:
-        - emmy-spok
-      args:
-        XDG_HOME: ${__XDG_HOME}
-        EMACS_DIR: ${__EMACS_DIR}
-        NVM_DIR: ${__NVM_HOME}
-        CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
-        JAVA_HOMR: ${__JAVA_HOME}
-        CLOJURE_DIR: ${__CLOJURE_DIR}
-        GOROOT: ${__GOROOT}
-        CABAL_DIR: ${__CABAL_HOME}
-        PYTHON_HOME: ${__PYTHON_HOME}
-        NODE_VERSION: 20.13.10
-        # these are pulled from the user shell environment!
-        ORGMODE_TOKEN: ${ORG_TOKEN}
-        ORGMODE_REPO: ${ORG_REPO}
-        GH_USER_NAME: ${GH_USER_NAME}
-        GH_USER_EMAIL: ${GH_USER_EMAIL}
-        SPACEMACS_D_REPO: ${SPACEMACS_D_REPO}
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      emacs:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      gpu-layer:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      docker-layer:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      clojure-layer:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-    env_file: emmy-spok.env
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ['0']
-              capabilities: [gpu]
-    stdin_open: true
-    tty: true
-    shm_size: 2g
-    privileged: true
-    volumes:
-      - emmy-spok-emacs-cache:/opt/xdg/.config/emacs/.cache
-      - emmy-spok-emacs-eln-cache:/opt/xdg/.config/emacs/eln-cache
-      - emmy-spok-emacs-elpa:/opt/xdg/.config/emacs/elpa
-      - emmy-spok-emacs-quelpa:/opt/xdg/.config/emacs/quelpa
-      - emmy-spok-emacs-org-roam:/opt/xdg/.config/emacs/org-roam
-      - emmy-spok-code:/code
-      - emmy-spok-m2:/home/root/.m2
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - /tmp/emacs1000:/tmp/emacs1000
+  # emmy-spok:
+  #   image: emmy-spok
+  #   container_name: emmy-spok
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.emmy-spok
+  #     tags:
+  #       - emmy-spok
+  #     args:
+  #       XDG_HOME: ${__XDG_HOME}
+  #       EMACS_DIR: ${__EMACS_DIR}
+  #       NVM_DIR: ${__NVM_HOME}
+  #       CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
+  #       JAVA_HOMR: ${__JAVA_HOME}
+  #       CLOJURE_DIR: ${__CLOJURE_DIR}
+  #       GOROOT: ${__GOROOT}
+  #       CABAL_DIR: ${__CABAL_HOME}
+  #       PYTHON_HOME: ${__PYTHON_HOME}
+  #       NODE_VERSION: 20.13.10
+  #       # these are pulled from the user shell environment!
+  #       ORGMODE_TOKEN: ${ORG_TOKEN}
+  #       ORGMODE_REPO: ${ORG_REPO}
+  #       GH_USER_NAME: ${GH_USER_NAME}
+  #       GH_USER_EMAIL: ${GH_USER_EMAIL}
+  #       SPACEMACS_D_REPO: ${SPACEMACS_D_REPO}
+  #   depends_on:
+  #     xdg:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     emacs:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     gpu-layer:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     docker-layer:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     clojure-layer:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #   env_file: emmy-spok.env
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ['0']
+  #             capabilities: [gpu]
+  #   stdin_open: true
+  #   tty: true
+  #   shm_size: 2g
+  #   privileged: true
+    # volumes:
+    #   - emmy-spok-emacs-cache:/opt/xdg/.config/emacs/.cache
+    #   - emmy-spok-emacs-eln-cache:/opt/xdg/.config/emacs/eln-cache
+    #   - emmy-spok-emacs-elpa:/opt/xdg/.config/emacs/elpa
+    #   - emmy-spok-emacs-quelpa:/opt/xdg/.config/emacs/quelpa
+    #   - emmy-spok-emacs-org-roam:/opt/xdg/.config/emacs/org-roam
+    #   - emmy-spok-code:/code
+    #   - emmy-spok-m2:/home/root/.m2
+    #   - /tmp/.X11-unix:/tmp/.X11-unix
+    #   - /tmp/emacs1000:/tmp/emacs1000
 
   # ============================================================================
   # xdg
@@ -79,123 +79,129 @@ services:
       tags:
         - xdg
       args:
-        XDG_HOME: ${__XDG_HOME}
+        XDG_HOME: /opt/xdg #${__XDG_HOME}
 
   # ============================================================================
   # emacs
   # ============================================================================
 
-  emacs:
-    image: emacs
-    container_name: emacs
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.emacs
-      tags:
-        - emacs
-      args:
-        EMACS_DIR: ${__EMACS_DIR}
-        EMACS_VERSION: 29.3
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+  # emacs:
+  #   image: emacs
+  #   container_name: emacs
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.emacs
+  #     tags:
+  #       - emacs
+  #     args:
+  #       EMACS_DIR: ${__EMACS_DIR}
+  #       EMACS_VERSION: 29.3
+  #   depends_on:
+  #     xdg:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
 
   # ============================================================================
   # gpu layer
   # ============================================================================
   # nvidia/cuda:12.4.1-devel-ubuntu22.04
   # https://gitlab.com/nvidia/container-images/cuda/-/tree/master/dist/12.4.1/ubuntu2204
-  gpu-layer:
-    image: gpu-layer
-    container_name: gpu-layer
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.gpu-layer
-      tags:
-        - gpu-layer
-      args:
-        LLVM_VERSION: 18
-        NVIDIA_BASE_IMAGE: nvcr.io/nvidia/cuda:12.4.1-devel-ubuntu20.04
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      cuda:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      nsight-compute:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      llvm:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      mlir:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+  # gpu-layer:
+  #   image: gpu-layer
+  #   container_name: gpu-layer
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.gpu-layer
+  #     tags:
+  #       - gpu-layer
+  #     args:
+  #       LLVM_VERSION: 18
+  #       NVIDIA_BASE_IMAGE: nvcr.io/nvidia/cuda:12.4.1-devel-ubuntu20.04
+  #   depends_on:
+  #     xdg:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     cuda:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     nsight-compute:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     llvm:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
+  #     mlir:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
 
-  cuda:
-    image: cuda
-    container_name: cuda
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.cuda
-      tags:
-        - cuda
-      args:
-        CUDA_BASE_IMAGE: nvcr.io/nvidia/cuda:12.4.1-devel-ubuntu20.04
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+  # cuda:
+  #   image: cuda
+  #   container_name: cuda
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.cuda
+  #     tags:
+  #       - cuda
+  #     args:
+  #       CUDA_BASE_IMAGE: nvcr.io/nvidia/cuda:12.4.1-devel-ubuntu20.04
+  #   depends_on:
+  #     xdg:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
 
-  mlir:
-    image: mlir
-    container_name: mlir
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.mlir
-      tags:
-        - mlir
-      args:
-        LLVM_VERSION: 18
-    depends_on:
-      llvm:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+  # mlir:
+  #   image: mlir
+  #   container_name: mlir
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.mlir
+  #     tags:
+  #       - mlir
+  #     args:
+  #       LLVM_VERSION: 18
+  #   depends_on:
+  #     llvm:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
 
-  llvm:
-    image: llvm
-    container_name: llvm
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.llvm
-      tags:
-        - llvm
-      args:
-        LLVM_VERSION: 18
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+  # llvm:
+  #   image: llvm
+  #   container_name: llvm
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.llvm
+  #     tags:
+  #       - llvm
+  #     args:
+  #       LLVM_VERSION: 18
+  #   depends_on:
+  #     xdg:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
 
-  nsight-compute:
-    image: nsight-compute
-    container_name: nsight-compute
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.nsight-compute
-      tags:
-        - nsight-compute
-    depends_on:
-      cuda:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+  # nsight-compute:
+  #   image: nsight-compute
+  #   container_name: nsight-compute
+  #   command: ${__COMPOSE_COMMAND}
+  #   build:
+  #     dockerfile: Dockerfile.nsight-compute
+  #     tags:
+  #       - nsight-compute
+  #   depends_on:
+  #     cuda:
+  #       required: true
+  #       condition: ${__COMPOSE_CONDITION}
 
 
   # ============================================================================
   # clojure layer
   # ============================================================================
+
+  # .env for defaults like command and condition, emmy-spok.env for build time args!
+  # docker --debug compose --env-file .env --env-file emmy-spok.env -f emmy-spok.yml up -d --build --remove-orphans clojure-layer
+
+  # .env for defaults like command and condition, emmy-spok.env for run time args!
+  # docker compose --env-file emmy-spok.env --env-file .env -f emmy-spok.yml exec clojure-layer /bin/bash
 
   clojure-layer:
     image: clojure-layer
@@ -206,12 +212,9 @@ services:
       tags:
         - clojure-layer
       args:
-        LAYER_NAME: clojure
-        LAYER_TYPE: lang
-        CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
-        JAVA_HOME: ${__JAVA_HOME}
-        CLOJURE_DIR: ${__CLOJURE_DIR}
-        GOROOT: ${__GOROOT}
+        GOROOT: ${SPOK_GOROOT}
+    env_file:
+      emmy-spok.env
     depends_on:
       xdg:
         required: true
@@ -238,8 +241,8 @@ services:
       dockerfile: Dockerfile.clj-kondo
       tags:
         - clj-kondo
-      args:
-        CLJ_KONDO_DIR: ${__CLJ_KONDO_DIR}
+    env_file:
+      emmy-spok.env
     depends_on:
       xdg:
         required: true
@@ -254,7 +257,9 @@ services:
       tags:
         - joker
       args:
-        GOROOT: ${__GOROOT}
+        GOROOT: ${SPOK_GOROOT}
+    env_file:
+      emmy-spok.env
     depends_on:
       go:
         required: true
@@ -273,8 +278,10 @@ services:
       tags:
         - go
       args:
-        GO_VERSION: 1.21.6
-        GOROOT: ${__GOROOT}
+        GO_VERSION: ${SPOK_GO_VERSION}
+        GOROOT: ${SPOK_GOROOT}
+    env_file:
+      emmy-spok.env
     depends_on:
       xdg:
         required: true
@@ -293,10 +300,9 @@ services:
       tags:
         - jdk
       args:
-        JAVA_HOME: ${__JAVA_HOME}
-        JDK_MAJOR_VERSION: 21
-        JDK_MINOR_VERSION: 0.3
-        JDK_BUILD_NUMBER: 9
+        JDK_MAJOR_VERSION: ${SPOK_JAVA_MAJOR_VERSION}
+    env_file:
+      emmy-spok.env
     depends_on:
       xdg:
         required: true
@@ -310,252 +316,251 @@ services:
       dockerfile: Dockerfile.clojure
       tags:
         - clojure
-      args:
-        CLOJURE_DIR: ${__CLOJURE_DIR}
-        JAVA_HOME: ${__JAVA_HOME}
+    env_file:
+      emmy-spok.env
     depends_on:
       jdk:
         required: true
         condition: ${__COMPOSE_CONDITION}
 
-  # ============================================================================
-  # docker layer
-  # ============================================================================
+ #  # ============================================================================
+#   # docker layer
+#   # ============================================================================
 
-  docker-layer:
-    image: docker-layer
-    container_name: docker-layer
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.docker-layer
-      tags:
-        - docker-layer
-      args:
-        LAYER_NAME: docker
-        LAYER_TYPE: tools
-        NVM_DIR: ${__NVM_HOME}
-        CABAL_DIR: ${__CABAL_HOME}
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      docker-lsp:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      hadolint:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   docker-layer:
+#     image: docker-layer
+#     container_name: docker-layer
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.docker-layer
+#       tags:
+#         - docker-layer
+#       args:
+#         LAYER_NAME: docker
+#         LAYER_TYPE: tools
+#         NVM_DIR: ${__NVM_HOME}
+#         CABAL_DIR: ${__CABAL_HOME}
+#     depends_on:
+#       xdg:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       docker-lsp:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       hadolint:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  # ----------------------------------------------------------------------------
-  # docker layer dependencies
-  # ----------------------------------------------------------------------------
+#   # ----------------------------------------------------------------------------
+#   # docker layer dependencies
+#   # ----------------------------------------------------------------------------
 
-  docker-lsp:
-    image: docker-lsp
-    container_name: docker-lsp
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.docker-lsp
-      tags:
-        - docker-lsp
-      args:
-        NVM_DIR: ${__NVM_HOME}
-    depends_on:
-      node:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   docker-lsp:
+#     image: docker-lsp
+#     container_name: docker-lsp
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.docker-lsp
+#       tags:
+#         - docker-lsp
+#       args:
+#         NVM_DIR: ${__NVM_HOME}
+#     depends_on:
+#       node:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  hadolint:
-    image: hadolint
-    container_name: hadolint
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.hadolint
-      tags:
-        - hadolint
-      args:
-        CABAL_DIR: ${__CABAL_HOME}
-        XDG_HOME: ${__XDG_HOME}
-    depends_on:
-      shellcheck:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   hadolint:
+#     image: hadolint
+#     container_name: hadolint
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.hadolint
+#       tags:
+#         - hadolint
+#       args:
+#         CABAL_DIR: ${__CABAL_HOME}
+#         XDG_HOME: ${__XDG_HOME}
+#     depends_on:
+#       shellcheck:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  # ----------------------------------------------------------------------------
-  # docker layer build dependencies
-  # ----------------------------------------------------------------------------
+#   # ----------------------------------------------------------------------------
+#   # docker layer build dependencies
+#   # ----------------------------------------------------------------------------
 
-  node:
-    image: node
-    container_name: node
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.node
-      tags:
-        - node
-      args:
-        NVM_DIR: ${__NVM_HOME}
-        NVM_VERSION: 0.39.3
-        NODE_VERSION: 20.13.1
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   node:
+#     image: node
+#     container_name: node
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.node
+#       tags:
+#         - node
+#       args:
+#         NVM_DIR: ${__NVM_HOME}
+#         NVM_VERSION: 0.39.3
+#         NODE_VERSION: 20.13.1
+#     depends_on:
+#       xdg:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  shellcheck:
-    image: shellcheck
-    container_name: shellcheck
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.shellcheck
-      tags:
-        - shellcheck
-      args:
-        CABAL_DIR: ${__CABAL_HOME}
-        XDG_HOME: ${__XDG_HOME}
-    depends_on:
-      cabal:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   shellcheck:
+#     image: shellcheck
+#     container_name: shellcheck
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.shellcheck
+#       tags:
+#         - shellcheck
+#       args:
+#         CABAL_DIR: ${__CABAL_HOME}
+#         XDG_HOME: ${__XDG_HOME}
+#     depends_on:
+#       cabal:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  cabal:
-    image: cabal
-    container_name: cabal
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.cabal
-      tags:
-        - cabal
-      args:
-        CABAL_DIR: ${__CABAL_HOME}
-        XDG_HOME: ${__XDG_HOME}
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   cabal:
+#     image: cabal
+#     container_name: cabal
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.cabal
+#       tags:
+#         - cabal
+#       args:
+#         CABAL_DIR: ${__CABAL_HOME}
+#         XDG_HOME: ${__XDG_HOME}
+#     depends_on:
+#       xdg:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  # ============================================================================
-  # shell-scripts layer
-  # ============================================================================
+#   # ============================================================================
+#   # shell-scripts layer
+#   # ============================================================================
 
-  shell-scripts-layer:
-    image: shell-scripts-layer
-    container_name: shell-scripts-layer
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.shell-scripts-layer
-      tags:
-        - shell-scripts-layer
-      args:
-        LAYER_NAME: shell-scripts
-        LAYER_TYPE: lang
-        NVM_DIR: ${__NVM_HOME}
-        CABAL_DIR: ${__CABAL_HOME}
-        PYTHON_HOME: ${__PYTHON_HOME}
-        GOROOT: ${__GOROOT}
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      bashate:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      shellcheck:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      shfmt:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      bash-language-server:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   shell-scripts-layer:
+#     image: shell-scripts-layer
+#     container_name: shell-scripts-layer
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.shell-scripts-layer
+#       tags:
+#         - shell-scripts-layer
+#       args:
+#         LAYER_NAME: shell-scripts
+#         LAYER_TYPE: lang
+#         NVM_DIR: ${__NVM_HOME}
+#         CABAL_DIR: ${__CABAL_HOME}
+#         PYTHON_HOME: ${__PYTHON_HOME}
+#         GOROOT: ${__GOROOT}
+#     depends_on:
+#       xdg:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       bashate:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       shellcheck:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       shfmt:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       bash-language-server:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  # ----------------------------------------------------------------------------
-  # shell-scripts layer dependencies
-  # ----------------------------------------------------------------------------
+#   # ----------------------------------------------------------------------------
+#   # shell-scripts layer dependencies
+#   # ----------------------------------------------------------------------------
 
-  bash-language-server:
-    image: bash-language-server
-    container_name: bash-language-server
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.bash-language-server
-      tags:
-        - bash-language-server
-      args:
-        NVM_DIR: ${__NVM_HOME}
-    depends_on:
-      node:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      shellcheck:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      bashate:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   bash-language-server:
+#     image: bash-language-server
+#     container_name: bash-language-server
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.bash-language-server
+#       tags:
+#         - bash-language-server
+#       args:
+#         NVM_DIR: ${__NVM_HOME}
+#     depends_on:
+#       node:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       shellcheck:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       bashate:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  bashate:
-    image: bashate
-    container_name: bashate
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.bashate
-      tags:
-        - bashate
-      args:
-        PYTHON_HOME: ${__PYTHON_HOME}
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
-      python:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   bashate:
+#     image: bashate
+#     container_name: bashate
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.bashate
+#       tags:
+#         - bashate
+#       args:
+#         PYTHON_HOME: ${__PYTHON_HOME}
+#     depends_on:
+#       xdg:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
+#       python:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
 
-  shfmt:
-    image: shfmt
-    container_name: shfmt
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.shfmt
-      tags:
-        - shfmt
-      args:
-        GOROOT: ${__GOROOT}
-    depends_on:
-      go:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   shfmt:
+#     image: shfmt
+#     container_name: shfmt
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.shfmt
+#       tags:
+#         - shfmt
+#       args:
+#         GOROOT: ${__GOROOT}
+#     depends_on:
+#       go:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-  python:
-    image: python
-    container_name: python
-    command: ${__COMPOSE_COMMAND}
-    build:
-      dockerfile: Dockerfile.python
-      tags:
-        - python
-      args:
-        PYTHON_HOME: ${__PYTHON_HOME}
-        PYTHON_MAJOR_VERSION: 3
-        PYTHON_MINOR_VERSION: 12
-        PYTHON_BUILD_NUMBER: 3
-    depends_on:
-      xdg:
-        required: true
-        condition: ${__COMPOSE_CONDITION}
+#   python:
+#     image: python
+#     container_name: python
+#     command: ${__COMPOSE_COMMAND}
+#     build:
+#       dockerfile: Dockerfile.python
+#       tags:
+#         - python
+#       args:
+#         PYTHON_HOME: ${__PYTHON_HOME}
+#         PYTHON_MAJOR_VERSION: 3
+#         PYTHON_MINOR_VERSION: 12
+#         PYTHON_BUILD_NUMBER: 3
+#     depends_on:
+#       xdg:
+#         required: true
+#         condition: ${__COMPOSE_CONDITION}
 
-# ----------------------------------------------------------------------------
-# volumes
-# ----------------------------------------------------------------------------
+# # ----------------------------------------------------------------------------
+# # volumes
+# # ----------------------------------------------------------------------------
 
-volumes:
-  emmy-spok-emacs-cache:
-  emmy-spok-emacs-eln-cache:
-  emmy-spok-emacs-elpa:
-  emmy-spok-emacs-quelpa:
-  emmy-spok-emacs-org-roam:
-  emmy-spok-code:
-  emmy-spok-m2:
+# volumes:
+#   emmy-spok-emacs-cache:
+#   emmy-spok-emacs-eln-cache:
+#   emmy-spok-emacs-elpa:
+#   emmy-spok-emacs-quelpa:
+#   emmy-spok-emacs-org-roam:
+#   emmy-spok-code:
+#   emmy-spok-m2:

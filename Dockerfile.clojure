@@ -1,22 +1,12 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs clojure in $CLOJURE_DIR.
-# https://clojure.org/guides/install_clojure#_linux_instructions
-
-ARG CLOJURE_DIR
-ARG JAVA_HOME
+# Installs clojure: https://clojure.org/guides/install_clojure#_linux_instructions
 
 ################################################################################
 FROM jdk AS clojure
 ################################################################################
 
-ARG CLOJURE_DIR
-ARG JAVA_HOME
-
-#-------------------------------------------------------------------------------
-# build dependencies
-# ------------------------------------------------------------------------------
-
+# install deps
 RUN bash -x <<"EOF"
 set -eu
 apt-get update
@@ -28,15 +18,11 @@ apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
-# ------------------------------------------------------------------------------
-# clojure
-# ------------------------------------------------------------------------------
-
+# install clojure
 RUN bash -x <<"EOF"
 set -eu
-mkdir ${CLOJURE_DIR} && cd ${CLOJURE_DIR} || exit 1
 curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
 chmod +x linux-install.sh
-./linux-install.sh --prefix ${CLOJURE_DIR}
+./linux-install.sh
 rm linux-install.sh
 EOF

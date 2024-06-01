@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs https://github.com/golang/go in $GOROOT.
+# Installs go: https://github.com/golang/go
 
 ARG GO_VERSION
 ARG GOROOT
@@ -11,11 +11,9 @@ FROM xdg AS go
 
 ARG GO_VERSION
 ARG GOROOT
+ENV PATH=$PATH:${GOROOT}/bin
 
-#-------------------------------------------------------------------------------
-# build dependencies
-# ------------------------------------------------------------------------------
-
+# install deps
 RUN bash -x <<"EOF"
 set -eu
 apt-get update
@@ -28,14 +26,12 @@ apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
-# ------------------------------------------------------------------------------
-# go
-# ------------------------------------------------------------------------------
-
+# install go
 RUN bash -x <<"EOF"
 set -eu
-grd=$(dirname "$GOROOT")
-wget https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
-tar -C "$grd" -xzf go${GO_VERSION}.linux-amd64.tar.gz
-rm go${GO_VERSION}.linux-amd64.tar.gz
+f=go${GO_VERSION}.linux-amd64.tar.gz
+wget https://golang.org/dl/$f
+d=$(dirname "${GOROOT}")
+tar -C $d -xzf $f
+rm $f
 EOF

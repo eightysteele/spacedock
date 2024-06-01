@@ -1,20 +1,12 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs clj-kondo to $CLJ_KONDO_DIR/clj-kondo.
-# https://github.com/clj-kondo/clj-kondo
-
-ARG CLJ_KONDO_DIR
+# Installs clj-kondo: https://github.com/clj-kondo/clj-kondo
 
 ################################################################################
 FROM xdg AS clj-kondo
 ################################################################################
 
-ARG CLJ_KONDO_DIR
-
-#-------------------------------------------------------------------------------
-# build dependencies
-# ------------------------------------------------------------------------------
-
+# install deps
 RUN bash -x <<"EOF"
 set -eu
 rm -f /etc/apt/apt.conf.d/docker-clean
@@ -29,15 +21,11 @@ apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
-# ------------------------------------------------------------------------------
-# clj-kondo
-# ------------------------------------------------------------------------------
-
+# install clj-kondo
 RUN bash -x <<"EOF"
 set -eu
-mkdir ${CLJ_KONDO_DIR} && cd ${CLJ_KONDO_DIR} || exit 1
 curl -sLO https://raw.githubusercontent.com/clj-kondo/clj-kondo/master/script/install-clj-kondo
 chmod +x install-clj-kondo
-./install-clj-kondo --dir ${CLJ_KONDO_DIR} --download-dir ${CLJ_KONDO_DIR}
+./install-clj-kondo
 rm -rf install-clj-kondo
 EOF

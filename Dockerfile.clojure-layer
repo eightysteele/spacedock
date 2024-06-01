@@ -1,26 +1,15 @@
 # syntax=docker/dockerfile:1.7-labs
 
-ARG LAYER_NAME
-ARG LAYER_TYPE
-ARG CLJ_KONDO_DIR
-ARG JAVA_HOME
-ARG CLOJURE_DIR
 ARG GOROOT
 
 ################################################################################
 FROM xdg AS clojure-layer
 ################################################################################
 
-ARG LAYER_NAME
-ARG LAYER_TYPE
-ARG CLJ_KONDO_DIR
-ARG JAVA_HOME
-ARG CLOJURE_DIR
 ARG GOROOT
+ENV GOBIN=${GOROOT}/bin
+ENV PATH=${GOBIN}:$PATH
 
-ARG LAYER=/spacemacs/layers/${LAYER_TYPE}/${LAYER_NAME}
-
-COPY --from=clj-kondo ${CLJ_KONDO_DIR}/clj-kondo ${LAYER}/clj-kondo
-COPY --from=go ${GOROOT} ${GOROOT}
-COPY --from=jdk ${JAVA_HOME} ${JAVA_HOME}
-COPY --from=clojure ${CLOJURE_DIR} ${CLOJURE_DIR}
+COPY --from=clojure / /
+COPY --from=clj-kondo / /
+COPY --from=joker / /
