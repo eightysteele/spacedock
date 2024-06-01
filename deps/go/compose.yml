@@ -1,0 +1,21 @@
+name: go
+
+include:
+  - ../../utils/compose.yml
+
+services:
+  go:
+    image: go
+    container_name: go
+    command: ${SPACEDOCK_COMMAND}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - go
+      args:
+        GO_VERSION: ${GO_DEP_VERSION}
+        GOROOT: ${GO_DEP_GOROOT}
+    depends_on:
+      xdg:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}

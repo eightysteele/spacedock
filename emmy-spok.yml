@@ -241,8 +241,6 @@ services:
       dockerfile: Dockerfile.clj-kondo
       tags:
         - clj-kondo
-    env_file:
-      emmy-spok.env
     depends_on:
       xdg:
         required: true
@@ -316,8 +314,6 @@ services:
       dockerfile: Dockerfile.clojure
       tags:
         - clojure
-    env_file:
-      emmy-spok.env
     depends_on:
       jdk:
         required: true

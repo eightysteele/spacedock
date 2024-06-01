@@ -1,0 +1,20 @@
+name: jdk
+
+include:
+  - ../../utils/compose.yml
+
+services:
+  jdk:
+    image: jdk
+    container_name: jdk
+    command: ${SPACEDOCK_COMMAND}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - jdk
+      args:
+        JDK_MAJOR_VERSION: ${JDK_SERVICE_VERSION}
+    depends_on:
+      xdg:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}

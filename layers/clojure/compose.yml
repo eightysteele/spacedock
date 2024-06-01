@@ -1,0 +1,37 @@
+name: clojure-layer
+
+include:
+  - ../../utils/compose.yml
+  - ../../deps/clj-kondo/compose.yml
+  - ../../deps/clojure/compose.yml
+  - ../../deps/joker/compose.yml
+  # this is the only weird thing....
+  - ../../deps/go/compose.yml
+
+services:
+  clojure-layer:
+    image: clojure-layer
+    container_name: clojure-layer
+    command: ${SPACEDOCK_COMMAND}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - clojure-layer
+      args:
+        GOROOT: ${GO_DEP_GOROOT}
+    depends_on:
+      xdg:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}
+      clj-kondo:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}
+      joker:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}
+      clojure:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}
+      go:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}

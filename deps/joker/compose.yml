@@ -1,0 +1,21 @@
+name: joker
+
+include:
+  - ../../utils/compose.yml
+  - ../../deps/go/compose.yml
+
+services:
+  joker:
+    image: joker
+    container_name: joker
+    command: ${SPACEDOCK_COMMAND}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - joker
+      args:
+        GOROOT: ${GO_DEP_GOROOT}
+    depends_on:
+      go:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}

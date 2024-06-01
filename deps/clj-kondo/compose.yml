@@ -1,0 +1,18 @@
+name: clj-kondo
+
+include:
+  - ../../utils/compose.yml
+
+services:
+  clj-kondo:
+    image: clj-kondo
+    container_name: clj-kondo
+    command: ${SPACEDOCK_COMMAND}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - clj-kondo
+    depends_on:
+      xdg:
+        required: true
+        condition: ${SPACEDOCK_CONDITION}
