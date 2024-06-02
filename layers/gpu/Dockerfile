@@ -4,8 +4,5 @@
 FROM xdg AS gpu-layer
 ################################################################################
 
-COPY --from=cuda / /
-COPY --from=nsight-compute / /
+COPY --from=cuda-toolkit / /
 COPY --from=llvm / /
-COPY --from=mlir / /
-

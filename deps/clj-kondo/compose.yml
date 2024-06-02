@@ -1,13 +1,12 @@
 name: clj-kondo
 
 include:
-  - ../../utils/compose.yml
+  - ../xdg/compose.yml
 
 services:
   clj-kondo:
     image: clj-kondo
-    container_name: clj-kondo
-    command: ${SPACEDOCK_COMMAND}
+    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
     build:
       dockerfile: Dockerfile
       tags:
@@ -15,4 +14,4 @@ services:
     depends_on:
       xdg:
         required: true
-        condition: ${SPACEDOCK_CONDITION}
+        condition: service_started

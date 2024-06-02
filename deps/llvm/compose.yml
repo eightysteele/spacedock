@@ -1,18 +1,18 @@
-name: jdk
+name: llvm
 
 include:
   - ../xdg/compose.yml
 
 services:
-  jdk:
-    image: jdk
+  llvm:
+    image: llvm
     command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
     build:
       dockerfile: Dockerfile
       tags:
-        - jdk
+        - llvm
       args:
-        JDK_MAJOR_VERSION: ${ENV_JDK_VERSION}
+        LLVM_VERSION: ${ENV_LLVM_VERSION}
     depends_on:
       xdg:
         required: true

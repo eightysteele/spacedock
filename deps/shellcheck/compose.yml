@@ -1,0 +1,26 @@
+name: shellcheck
+
+include:
+  - ../xdg/compose.yml
+  - ../cabal/compose.yml
+
+services:
+  shellcheck:
+    image: shellcheck
+    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    environment:
+      PATH: ${ENV_SHELLCHECK_PATH}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - shellcheck
+      args:
+        XDG_HOME: ${ENV_XDG_HOME}
+        CABAL_DIR: ${ENV_CABAL_DIR}
+    depends_on:
+      xdg:
+        required: true
+        condition: service_started
+      cabal:
+        required: true
+        condition: service_started

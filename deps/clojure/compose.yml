@@ -1,14 +1,13 @@
 name: clojure
 
 include:
-  - ../../utils/compose.yml
-  - ../../deps/jdk/compose.yml
+  - ../xdg/compose.yml
+  - ../jdk/compose.yml
 
 services:
   clojure:
     image: clojure
-    container_name: clojure
-    command: ${SPACEDOCK_COMMAND}
+    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
     build:
       dockerfile: Dockerfile
       tags:
@@ -16,4 +15,4 @@ services:
     depends_on:
       jdk:
         required: true
-        condition: ${SPACEDOCK_CONDITION}
+        condition: service_started

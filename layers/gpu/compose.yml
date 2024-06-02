@@ -1,0 +1,41 @@
+name: gpu-layer
+
+include:
+  - ../../deps/xdg/compose.yml
+  - ../../deps/cuda-toolkit/compose.yml
+  - ../../deps/llvm/compose.yml
+
+services:
+  gpu-layer:
+    image: gpu-layer
+    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    environment:
+      DISPLAY: $DISPLAY
+      PATH: ${ENV_GPU_LAYER_PATH}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - gpu-layer
+    depends_on:
+      xdg:
+        required: true
+        condition: service_started
+      cuda-toolkit:
+        required: true
+        condition: service_started
+      llvm:
+        required: true
+        condition: service_started
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    shm_size: 2g
+    privileged: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix

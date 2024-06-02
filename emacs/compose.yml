@@ -1,18 +1,18 @@
-name: jdk
+name: emacs
 
 include:
-  - ../xdg/compose.yml
+  - ../deps/xdg/compose.yml
 
 services:
-  jdk:
-    image: jdk
+  emacs:
+    image: emacs
     command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
     build:
       dockerfile: Dockerfile
       tags:
-        - jdk
+        - emacs
       args:
-        JDK_MAJOR_VERSION: ${ENV_JDK_VERSION}
+        EMACS_VERSION: ${EMACS_VERSION}
     depends_on:
       xdg:
         required: true

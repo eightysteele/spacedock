@@ -29,16 +29,13 @@ get_include_env_paths() {
 	local yaml_file=$1
 	local include_paths=()
 
-	# Read the YAML file and extract lines under the "include:" attribute
 	while IFS= read -r line; do
 		if [[ $line =~ ^[[:space:]]*-[[:space:]]*(.*) ]]; then
-			# Extract the directory path and replace the filename with .env
 			dir_path=$(dirname "${BASH_REMATCH[1]}")
 			include_paths+=("$dir_path/.env")
 		fi
 	done < <(awk '/^include:/,/^$/' "$yaml_file")
 
-	# Return the single string of paths with --env-file prefix
 	local result=""
 	for path in "${include_paths[@]}"; do
 		result+="--env-file $path "
@@ -60,13 +57,12 @@ compose_start() {
 	popd
 }
 
-# docker compose --env-file ../../utils/.env up -d --build --remove-orphans clojure-layer
 compose_up() {
 	local service=$(get_service)
-	stop_containers
+	#stop_containers
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
 	local env_files=$(get_include_env_paths "compose.yml")
-	local cmd="docker compose --project-name $service $env_files --env-file .env up -d --build --remove-orphans"
+	local cmd="docker compose -p $service $env_files --env-file .env up -d --build "
 	printf "\n%s\n" "$cmd"
 	$cmd
 	popd
@@ -83,7 +79,7 @@ compose_exec() {
 	service=$(get_service)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
 	local env_files=$(get_include_env_paths "compose.yml")
-	cmd="docker compose "$env_files" --env-file .env exec "$service" /bin/bash"
+	cmd="docker compose $env_files --env-file .env exec $service /bin/bash"
 	printf "\n%s\n" "$cmd"
 	$cmd
 	popd
@@ -109,7 +105,10 @@ compose_rm() {
 compose_ps() {
 	local service=$(get_service)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	docker compose --env-file ../../utils/.env -p "$service" ps
+	local env_files=$(get_include_env_paths "compose.yml")
+	cmd="docker compose $env_files -p $service ps -a"
+	printf "\n%s\n" "$cmd"
+	$cmd
 	popd
 }
 

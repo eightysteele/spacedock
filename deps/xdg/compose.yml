@@ -1,0 +1,12 @@
+services:
+  xdg:
+    image: xdg
+    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    environment:
+      PATH: ${ENV_XDG_PATH}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - xdg
+      args:
+        XDG_HOME: ${ENV_XDG_HOME}

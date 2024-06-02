@@ -62,3 +62,4 @@ cabal update
 cabal install cabal-install
 rm -rf ~/.cache
 EOF
+

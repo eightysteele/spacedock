@@ -1,0 +1,34 @@
+name: cuda-toolkit
+
+include:
+  - ../xdg/compose.yml
+
+services:
+  cuda-toolkit:
+    image: cuda-toolkit
+    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    environment:
+      DISPLAY: $DISPLAY
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - cuda-toolkit
+      args:
+        CUDA_TOOLKIT_VERSION: ${ENV_CUDA_TOOLKIT_VERSION}
+    depends_on:
+      xdg:
+        required: true
+        condition: service_started
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    stdin_open: true
+    tty: true
+    shm_size: 2g
+    privileged: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix

@@ -1,0 +1,22 @@
+name: cabal
+
+include:
+  - ../xdg/compose.yml
+
+services:
+  cabal:
+    image: cabal
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_CABAL_PATH}
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - cabal
+      args:
+        XDG_HOME: ${ENV_XDG_HOME}
+        CABAL_DIR: ${ENV_CABAL_DIR}
+    depends_on:
+      xdg:
+        required: true
+        condition: service_started

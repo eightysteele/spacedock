@@ -25,18 +25,16 @@
 #   git
 #   wget
 
-ARG EMACS_DIR
 ARG EMACS_VERSION
 
 ################################################################################
 FROM xdg AS emacs
 ################################################################################
 
-ARG EMACS_DIR
 ARG EMACS_VERSION
 
 # ------------------------------------------------------------------------------
-# install build dependencies
+# install deps
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -76,7 +74,7 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 #-------------------------------------------------------------------------------
-# build emacs
+# install emacs
 #-------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -96,7 +94,6 @@ fi
 tar xf $tar
 pushd $dir
 ./configure \
-    --prefix=${EMACS_DIR} \
     --with-xwidgets \
     --with-x \
     --with-x-toolkit=gtk3 \
