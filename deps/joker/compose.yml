@@ -1,19 +1,23 @@
 name: joker
 
 include:
-  - ../xdg/compose.yml
   - ../go/compose.yml
 
 services:
   joker:
     image: joker
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_GOROOT}/bin:${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:
         - joker
       args:
-        GOROOT: ${ENV_GO_GOROOT}
+        GOROOT: ${ENV_GOROOT}
     depends_on:
       go:
         required: true

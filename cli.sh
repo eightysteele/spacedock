@@ -17,6 +17,17 @@ get_service() {
 	echo "$service"
 }
 
+get_env_files() {
+	local env_files=""
+	local type=$(dirname "$COMMAND_PATH")
+	if [ "$type" == "layers" ]; then
+		env_files="--env-file ../../deps/default.env --env-file override.env"
+	else
+		env_files="--env-file ../default.env --env-file override.env"
+	fi
+	echo "$env_files"
+}
+
 stop_containers() {
 	echo "stoping containers..."
 	if docker stop $(docker ps -q) 2>/dev/null; then
@@ -46,24 +57,27 @@ get_include_env_paths() {
 compose_build() {
 	local service=$(get_service)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	docker compose --env-file ../../utils/.env -p "$service" build
+	local cmd="docker compose --env-file ../default.env --env-file override.env -p $service build"
+	printf "\n%s\n\n" "$cmd"
+	$cmd
 	popd
 }
 
 compose_start() {
 	local service=$(get_service)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	docker compose --env-file ../../utils/.env -p "$service" start "$service"
+	local cmd="docker compose --env-file ../default.env --env-file override.env -p $service start"
+	printf "\n%s\n\n" "$cmd"
+	$cmd
 	popd
 }
 
 compose_up() {
 	local service=$(get_service)
-	#stop_containers
+	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	local env_files=$(get_include_env_paths "compose.yml")
-	local cmd="docker compose -p $service $env_files --env-file .env up -d --build "
-	printf "\n%s\n" "$cmd"
+	local cmd="docker compose $env_files -p $service up -d --build --remove-orphans"
+	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
@@ -77,10 +91,10 @@ compose_stop() {
 
 compose_exec() {
 	service=$(get_service)
+	env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	local env_files=$(get_include_env_paths "compose.yml")
-	cmd="docker compose $env_files --env-file .env exec $service /bin/bash"
-	printf "\n%s\n" "$cmd"
+	cmd="docker compose $env_files exec $service /bin/bash"
+	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
@@ -88,9 +102,8 @@ compose_exec() {
 compose_config() {
 	service=$(get_service)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	local env_files=$(get_include_env_paths "compose.yml")
-	cmd="docker compose $env_files --env-file .env config"
-	printf "\n%s\n" "$cmd"
+	cmd="docker compose config"
+	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
@@ -105,9 +118,8 @@ compose_rm() {
 compose_ps() {
 	local service=$(get_service)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	local env_files=$(get_include_env_paths "compose.yml")
-	cmd="docker compose $env_files -p $service ps -a"
-	printf "\n%s\n" "$cmd"
+	cmd="docker compose -p $service ps -a"
+	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }

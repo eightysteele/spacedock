@@ -6,7 +6,12 @@ include:
 services:
   jdk:
     image: jdk
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:

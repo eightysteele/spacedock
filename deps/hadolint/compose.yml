@@ -1,19 +1,19 @@
-name: shellcheck
+name: hadolint
 
 include:
   - ../xdg/compose.yml
-  - ../cabal/compose.yml
+  - ../shellcheck/compose.yml
 
 services:
-  shellcheck:
-    image: shellcheck
+  hadolint:
+    image: hadolint
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_SHELLCHECK_PATH}
+      PATH: ${ENV_HADOLINT_PATH}
     build:
       dockerfile: Dockerfile
       tags:
-        - shellcheck
+        - hadolint
       args:
         XDG_HOME: ${ENV_XDG_HOME}
         CABAL_DIR: ${ENV_CABAL_DIR}
@@ -21,6 +21,6 @@ services:
       xdg:
         required: true
         condition: service_started
-      cabal:
+      shellcheck:
         required: true
         condition: service_started

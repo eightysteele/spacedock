@@ -1,18 +1,23 @@
 name: emacs
 
 include:
-  - ../deps/xdg/compose.yml
+  - ../xdg/compose.yml
 
 services:
   emacs:
     image: emacs
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:
         - emacs
       args:
-        EMACS_VERSION: ${EMACS_VERSION}
+        EMACS_VERSION: ${ENV_EMACS_VERSION}
     depends_on:
       xdg:
         required: true

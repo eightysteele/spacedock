@@ -6,14 +6,19 @@ include:
 services:
   go:
     image: go
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_GOROOT}/bin:${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:
         - go
       args:
         GO_VERSION: ${ENV_GO_VERSION}
-        GOROOT: ${ENV_GO_GOROOT}
+        GOROOT: ${ENV_GOROOT}
     depends_on:
       xdg:
         required: true

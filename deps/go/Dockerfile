@@ -9,7 +9,6 @@ FROM xdg AS go
 
 ARG GO_VERSION
 ARG GOROOT
-ENV PATH=$PATH:${GOROOT}/bin
 
 # install deps
 RUN bash -x <<"EOF"

@@ -1,9 +1,15 @@
+name: xdg
+
 services:
   xdg:
     image: xdg
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
     environment:
+      XDG_HOME: ${ENV_XDG_HOME}
       PATH: ${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:

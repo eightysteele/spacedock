@@ -1,25 +1,24 @@
 name: gpu-layer
 
 include:
-  - ../../deps/xdg/compose.yml
   - ../../deps/cuda-toolkit/compose.yml
   - ../../deps/llvm/compose.yml
 
 services:
   gpu-layer:
     image: gpu-layer
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
     environment:
+      PATH: ${ENV_CUDA_TOOLKIT_PATH}:${ENV_XDG_PATH}
       DISPLAY: $DISPLAY
-      PATH: ${ENV_GPU_LAYER_PATH}
+    env_file:
+      - ../../deps/default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:
         - gpu-layer
     depends_on:
-      xdg:
-        required: true
-        condition: service_started
       cuda-toolkit:
         required: true
         condition: service_started
@@ -38,4 +37,4 @@ services:
     shm_size: 2g
     privileged: true
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${ENV_X_SERVER_VOLUME}
