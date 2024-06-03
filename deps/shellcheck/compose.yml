@@ -1,7 +1,6 @@
 name: shellcheck
 
 include:
-  - ../xdg/compose.yml
   - ../cabal/compose.yml
 
 services:
@@ -9,18 +8,19 @@ services:
     image: shellcheck
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_SHELLCHECK_PATH}
+      PATH: ${ENV_SHELLCHECK_PATH}:${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
     build:
       dockerfile: Dockerfile
       tags:
         - shellcheck
       args:
         XDG_HOME: ${ENV_XDG_HOME}
+        XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
         CABAL_DIR: ${ENV_CABAL_DIR}
     depends_on:
-      xdg:
-        required: true
-        condition: service_started
       cabal:
         required: true
         condition: service_started

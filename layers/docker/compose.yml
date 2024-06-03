@@ -1,0 +1,27 @@
+name: docker-layer
+
+include:
+  - ../../deps/hadolint/compose.yml
+  - ../../deps/docker-language-server/compose.yml
+
+services:
+  docker-layer:
+    image: docker-layer
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_NODE_PATH}:${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      DISPLAY: $DISPLAY
+    env_file:
+      - ../../deps/default.env
+      - override.env
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - docker-layer
+    depends_on:
+      hadolint:
+        required: true
+        condition: service_started
+      docker-language-server:
+        required: true
+        condition: service_started

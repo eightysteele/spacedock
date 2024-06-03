@@ -1,8 +1,7 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs Python to $PYTHON_DIR. https://www.python.org.
+# Installs python: https://www.python.org.
 
-ARG PYTHON_HOME
 ARG PYTHON_MAJOR_VERSION
 ARG PYTHON_MINOR_VERSION
 ARG PYTHON_BUILD_NUMBER
@@ -11,7 +10,6 @@ ARG PYTHON_BUILD_NUMBER
 FROM xdg AS python
 ################################################################################
 
-ARG PYTHON_HOME
 ARG PYTHON_MAJOR_VERSION
 ARG PYTHON_MINOR_VERSION
 ARG PYTHON_BUILD_NUMBER
@@ -61,11 +59,10 @@ base="https://www.python.org/ftp/python/$v/"
 d="Python-$v"
 tarf="$d.tgz"
 url="$base$tarf"
-mkdir -p ${PYTHON_HOME} || exit 1
 wget $url
 tar -xf $tarf
 pushd $d || exit 1
-./configure  --enable-optimizations --prefix=${PYTHON_HOME}
+./configure --enable-optimizations
 make
 make altinstall
 popd
@@ -76,8 +73,8 @@ EOF
 RUN bash -x <<"EOF"
 set -eu
 v="${PYTHON_MAJOR_VERSION}.${PYTHON_MINOR_VERSION}"
-update-alternatives --install /usr/bin/python3 python3 "${PYTHON_HOME}/bin/python$v" 1
-update-alternatives --install /usr/bin/pip3 pip3 "${PYTHON_HOME}/bin/pip$v" 1
+update-alternatives --install /usr/bin/python3 python3 "/usr/local/bin/python$v" 1
+update-alternatives --install /usr/bin/pip3 pip3 "/usr/local/bin/pip$v" 1
 update-alternatives --config python3
 update-alternatives --config pip3
 EOF

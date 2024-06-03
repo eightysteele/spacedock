@@ -1,25 +1,26 @@
-name: hadolint
+name: node
 
 include:
-  - ../shellcheck/compose.yml
+  - ../xdg/compose.yml
 
 services:
-  hadolint:
-    image: hadolint
+  node:
+    image: node
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_NODE_PATH}:${ENV_XDG_PATH}
     env_file:
       - ../default.env
       - override.env
     build:
       dockerfile: Dockerfile
       tags:
-        - hadolint
+        - node
       args:
-        XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
-        CABAL_DIR: ${ENV_CABAL_DIR}
+        NVM_DIR: ${ENV_NVM_DIR}
+        NVM_VERSION: ${ENV_NVM_VERSION}
+        NODE_VERSION: ${ENV_NODE_VERSION}
     depends_on:
-      shellcheck:
+      xdg:
         required: true
         condition: service_started

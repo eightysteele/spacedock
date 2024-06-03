@@ -3,12 +3,12 @@
 # Installs joker: https://github.com/candid82/joker
 
 ARG GOROOT
+ARG GOBIN
 
 FROM go AS joker
 
 ARG GOROOT
-ENV GOBIN=${GOROOT}/bin
-ENV PATH=${GOBIN}:$PATH
+ARG GOBIN
 
 # install deps
 RUN bash -x <<"EOF"

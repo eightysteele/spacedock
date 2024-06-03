@@ -1,25 +1,25 @@
-name: hadolint
+name: shfmt
 
 include:
-  - ../shellcheck/compose.yml
+  - ../go/compose.yml
 
 services:
-  hadolint:
-    image: hadolint
+  shfmt:
+    image: shfmt
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_SHFMT_PATH}:${ENV_XDG_PATH}
     env_file:
       - ../default.env
       - override.env
     build:
       dockerfile: Dockerfile
       tags:
-        - hadolint
+        - shfmt
       args:
-        XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
-        CABAL_DIR: ${ENV_CABAL_DIR}
+        GOROOT: ${ENV_GOROOT}
+        GOBIN: ${ENV_GOBIN}
     depends_on:
-      shellcheck:
+      go:
         required: true
         condition: service_started

@@ -75,6 +75,7 @@ compose_start() {
 compose_up() {
 	local service=$(get_service)
 	local env_files=$(get_env_files)
+	compose_config
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
 	local cmd="docker compose $env_files -p $service up -d --build --remove-orphans"
 	printf "\n%s\n\n" "$cmd"
@@ -101,8 +102,9 @@ compose_exec() {
 
 compose_config() {
 	service=$(get_service)
+	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	cmd="docker compose config"
+	cmd="docker compose $env_files config"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd

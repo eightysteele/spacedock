@@ -8,7 +8,8 @@ services:
     image: joker
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_GOROOT}/bin:${ENV_XDG_PATH}
+      PATH: ${ENV_GO_PATH}:${ENV_XDG_PATH}
+      GOBIN: ${ENV_GOBIN}
     env_file:
       - ../default.env
       - override.env
@@ -18,6 +19,7 @@ services:
         - joker
       args:
         GOROOT: ${ENV_GOROOT}
+        GOBIN: ${ENV_GOBIN}
     depends_on:
       go:
         required: true

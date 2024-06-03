@@ -1,13 +1,19 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds https://github.com/openstack/bashate into $PYTHON_HOME/bin/bashate
+# Installs https://github.com/mvdan/sh
+
+ARG GOROOT
+ARG GOBIN
 
 ################################################################################
-FROM python AS bashate
+FROM go AS shfmt
 ################################################################################
 
-# ------------------------------------------------------------------------------
-# build deps
+ARG GOROOT
+ARG GOBIN
+
+#-------------------------------------------------------------------------------
+# build dependencies
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -15,6 +21,7 @@ set -eu
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
+    build-essential \
     git
 apt-get clean
 apt-get autoremove -y
@@ -22,15 +29,11 @@ rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# bashate
+# shfmt
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
 set -eu
-git clone https://github.com/openstack/bashate.git
-pushd bashate
-pip3 install .
-popd
-rm -rf bashate
-echo ""
+export PATH=${GOBIN}:$PATH
+go install mvdan.cc/sh/v3/cmd/shfmt@latest
 EOF

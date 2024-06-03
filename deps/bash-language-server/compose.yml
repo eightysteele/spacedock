@@ -1,0 +1,33 @@
+name: bash-language-server
+
+include:
+  - ../node/compose.yml
+  - ../bashate/compose.yml
+  - ../shellcheck/compose.yml
+
+services:
+  bash-language-server:
+    image: bash-language-server
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_BASH_LANGUAGE_SERVER_PATH}:${ENV_XDG_PATH}
+    env_file:
+      - ../default.env
+      - override.env
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - bash-language-server
+      args:
+        NVM_DIR: ${ENV_NVM_DIR}
+    depends_on:
+      node:
+        required: true
+        condition: service_started
+      bashate:
+        required: true
+        condition: service_started
+      shellcheck:
+        required: true
+        condition: service_started
+

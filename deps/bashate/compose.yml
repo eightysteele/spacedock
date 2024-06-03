@@ -1,25 +1,22 @@
-name: hadolint
+name: bashate
 
 include:
-  - ../shellcheck/compose.yml
+  - ../python/compose.yml
 
 services:
-  hadolint:
-    image: hadolint
+  bashate:
+    image: bashate
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_BASHATE_PATH}
     env_file:
       - ../default.env
       - override.env
     build:
       dockerfile: Dockerfile
       tags:
-        - hadolint
-      args:
-        XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
-        CABAL_DIR: ${ENV_CABAL_DIR}
+        - bashate
     depends_on:
-      shellcheck:
+      xdg:
         required: true
         condition: service_started

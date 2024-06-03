@@ -4,10 +4,10 @@
 # https://specifications.freedesktop.org/basedir-spec/basedir-spec-0.6.html
 
 ARG XDG_HOME
-ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
-ARG XDG_CONFIG_HOME=${XDG_HOME}/.config
-ARG XDG_DATA_HOME=${XDG_HOME}/.local/share
-ARG XDG_CACHE_HOME=${XDG_HOME}/.cache
+ARG XDG_BIN_HOME
+ARG XDG_CONFIG_HOME
+ARG XDG_DATA_HOME
+ARG XDG_CACHE_HOME
 
 ################################################################################
 FROM ubuntu:22.04 AS xdg

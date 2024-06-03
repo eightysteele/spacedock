@@ -1,25 +1,24 @@
-name: hadolint
+name: docker-language-server
 
 include:
-  - ../shellcheck/compose.yml
+  - ../node/compose.yml
 
 services:
-  hadolint:
-    image: hadolint
+  docker-language-server:
+    image: docker-language-server
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_NODE_PATH}:${ENV_XDG_PATH}
     env_file:
       - ../default.env
       - override.env
     build:
       dockerfile: Dockerfile
       tags:
-        - hadolint
+        - docker-language-server
       args:
-        XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
-        CABAL_DIR: ${ENV_CABAL_DIR}
+        NVM_DIR: ${ENV_NVM_DIR}
     depends_on:
-      shellcheck:
+      xdg:
         required: true
         condition: service_started

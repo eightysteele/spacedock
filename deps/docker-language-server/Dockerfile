@@ -1,16 +1,21 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG SPACEDOCK_NVM_DIR
-ARG SPACEDOCK_NVM_VERSION
+
+# Builds dockerfile-language-server.
+#
+# COPY --from=docker-lsp ${NVM_DIR} ${NVM_DIR}
+#
+# https://github.com/rcjsuen/dockerfile-language-server
+
+ARG NVM_DIR
 
 ################################################################################
-FROM xdg AS nvm
+FROM node AS docker-language-server
 ################################################################################
 
-ARG SPACEDOCK_NVM_DIR
-ARG SPACEDOCK_NVM_VERSION
+ARG NVM_DIR
 
-#-------------------------------------------------------------------------------
-# Install dependencies.
+# ------------------------------------------------------------------------------
+# install build dependencies
 # ------------------------------------------------------------------------------
 
 RUN bash -x <<"EOF"
@@ -18,21 +23,26 @@ set -eu
 apt-get update
 apt-get install -y --no-install-recommends \
     ca-certificates \
-    curl
+    git
 apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
 
 # ------------------------------------------------------------------------------
-# Build nvm.
-# https://github.com/nvm-sh/nvm
+# build dockerfile-language-server
 # ------------------------------------------------------------------------------
+
 RUN bash -x <<"EOF"
 set -eu
-export NVM_DIR=${SPACEDOCK_NVM_DIR}
-mkdir ${NVM_DIR} || exit 1
-url=https://raw.githubusercontent.com/nvm-sh/nvm/v${SPACEDOCK_NVM_VERSION}/install.sh
-curl -o- $url | bash
-source $NVM_DIR/nvm.sh
+source ${NVM_DIR}/nvm.sh
+git clone https://github.com/rcjsuen/dockerfile-language-server.git
+pushd dockerfile-language-server
+npm install
+npm audit fix
+npm run build
+npm test
+npm install -g dockerfile-language-server-nodejs
+popd
+rm -rf dockerfile-language-server
 EOF

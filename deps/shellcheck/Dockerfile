@@ -8,7 +8,7 @@
 
 ARG CABAL_DIR
 ARG XDG_HOME
-ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
+ARG XDG_BIN_HOME
 
 ################################################################################
 FROM cabal AS shellcheck

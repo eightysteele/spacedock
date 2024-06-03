@@ -1,15 +1,12 @@
 # syntax=docker/dockerfile:1.7-labs
 
-ARG GOROOT
-
 ################################################################################
-FROM xdg AS clojure-layer
+FROM xdg AS shell-scripts-layer
 ################################################################################
 
-ARG GOROOT
-ENV GOBIN=${GOROOT}/bin
-ENV PATH=${GOBIN}:$PATH
+COPY --from=shfmt / /
+COPY --from=bashate / /
+COPY --from=bash-language-server / /
 
-COPY --from=clojure / /
-COPY --from=clj-kondo / /
-COPY --from=joker / /
+
+

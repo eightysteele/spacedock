@@ -12,9 +12,9 @@
 
 ARG CABAL_DIR
 ARG XDG_HOME
-ARG XDG_CONFIG_HOME=${XDG_HOME}/.config
-ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
-ARG XDG_DATA_HOME=${XDG_HOME}/.local/share
+ARG XDG_CONFIG_HOME
+ARG XDG_BIN_HOME
+ARG XDG_DATA_HOME
 
 ################################################################################
 FROM xdg AS cabal

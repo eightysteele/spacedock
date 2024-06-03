@@ -6,6 +6,10 @@ services:
     command: /usr/bin/tail -f /dev/null
     environment:
       XDG_HOME: ${ENV_XDG_HOME}
+      XDG_CONFIG_HOME: ${ENV_XDG_CONFIG_HOME}
+      XDG_CACHE_HOME: ${ENV_XDG_CACHE_HOME}
+      XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
+      XDG_DATA_HOME: ${ENV_XDG_DATA_HOME}
       PATH: ${ENV_XDG_PATH}
     env_file:
       - ../default.env
@@ -16,3 +20,7 @@ services:
         - xdg
       args:
         XDG_HOME: ${ENV_XDG_HOME}
+        XDG_CONFIG_HOME: ${ENV_XDG_CONFIG_HOME}
+        XDG_CACHE_HOME: ${ENV_XDG_CACHE_HOME}
+        XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
+        XDG_DATA_HOME: ${ENV_XDG_DATA_HOME}
