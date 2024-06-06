@@ -3,12 +3,16 @@
 # https://apt.llvm.org
 
 ARG LLVM_VERSION
+ARG USERNAME
 
 ################################################################################
 FROM xdg AS llvm
 ################################################################################
 
 ARG LLVM_VERSION
+ARG USERNAME
+
+USER root
 
 # ------------------------------------------------------------------------------
 # build deps
@@ -90,3 +94,5 @@ EOL
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 EOF
+
+USER ${USERNAME}

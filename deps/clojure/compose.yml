@@ -8,7 +8,7 @@ services:
     image: clojure
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_XDG_PATH}
+      PATH: ${ENV_CLOJURE_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -16,6 +16,8 @@ services:
       dockerfile: Dockerfile
       tags:
         - clojure
+      args:
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       jdk:
         required: true

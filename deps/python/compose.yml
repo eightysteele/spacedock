@@ -8,7 +8,7 @@ services:
     image: python
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_XDG_PATH}
+      PATH: ${ENV_PYTHON_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -20,6 +20,7 @@ services:
         PYTHON_MAJOR_VERSION: ${ENV_PYTHON_MAJOR_VERSION}
         PYTHON_MINOR_VERSION: ${ENV_PYTHON_MINOR_VERSION}
         PYTHON_BUILD_NUMBER: ${ENV_PYTHON_BUILD_NUMBER}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

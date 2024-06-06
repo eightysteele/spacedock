@@ -22,6 +22,7 @@ services:
         XDG_CONFIG_HOME: ${ENV_XDG_CONFIG_HOME}
         XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
         XDG_DATA_HOME: ${ENV_XDG_DATA_HOME}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

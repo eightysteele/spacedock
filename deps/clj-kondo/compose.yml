@@ -6,9 +6,9 @@ include:
 services:
   clj-kondo:
     image: clj-kondo
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_XDG_PATH}
+      PATH: ${ENV_CLJ_KONDO_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -16,6 +16,8 @@ services:
       dockerfile: Dockerfile
       tags:
         - clj-kondo
+      args:
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

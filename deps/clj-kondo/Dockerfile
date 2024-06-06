@@ -2,9 +2,15 @@
 
 # Installs clj-kondo: https://github.com/clj-kondo/clj-kondo
 
+ARG USERNAME
+
 ################################################################################
 FROM xdg AS clj-kondo
 ################################################################################
+
+ARG USERNAME
+
+USER root
 
 # install deps
 RUN bash -x <<"EOF"
@@ -29,3 +35,5 @@ chmod +x install-clj-kondo
 ./install-clj-kondo
 rm -rf install-clj-kondo
 EOF
+
+USER ${USERNAME}

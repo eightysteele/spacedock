@@ -2,6 +2,7 @@ name: shell-scripts-layer
 
 include:
   - ../../deps/shfmt/compose.yml
+  - ../../deps/shfmt/compose.yml
   - ../../deps/bashate/compose.yml
   - ../../deps/bash-language-server/compose.yml
 
@@ -10,7 +11,7 @@ services:
     image: shell-scripts
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_SHELL_SCRIPTS_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_SHELL_SCRIPTS_LAYER_PATH}
     env_file:
       - ../../deps/default.env
       - override.env
@@ -18,7 +19,12 @@ services:
       dockerfile: Dockerfile
       tags:
         - shell-scripts-layer
+      args:
+        USERNAME: ${ENV_USERNAME}
     depends_on:
+      xdg:
+        required: true
+        condition: service_started
       shfmt:
         required: true
         condition: service_started

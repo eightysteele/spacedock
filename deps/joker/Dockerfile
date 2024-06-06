@@ -4,11 +4,15 @@
 
 ARG GOROOT
 ARG GOBIN
+ARG USERNAME
 
 FROM go AS joker
 
 ARG GOROOT
 ARG GOBIN
+ARG USERNAME
+
+USER root
 
 # install deps
 RUN bash -x <<"EOF"
@@ -35,3 +39,5 @@ pushd joker
 popd
 rm -rf joker
 EOF
+
+USER ${USERNAME}

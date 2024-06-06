@@ -15,6 +15,7 @@ ARG XDG_HOME
 ARG XDG_CONFIG_HOME
 ARG XDG_BIN_HOME
 ARG XDG_DATA_HOME
+ARG USERNAME
 
 ################################################################################
 FROM xdg AS cabal
@@ -25,6 +26,9 @@ ARG XDG_HOME
 ARG XDG_CONFIG_HOME
 ARG XDG_BIN_HOME
 ARG XDG_DATA_HOME
+ARG USERNAME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # build deps
@@ -63,3 +67,4 @@ cabal install cabal-install
 rm -rf ~/.cache
 EOF
 
+USER ${USERNAME}

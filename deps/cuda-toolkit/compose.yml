@@ -8,7 +8,7 @@ services:
     image: cuda-toolkit
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_CUDA_TOOLKIT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_CUDA_TOOLKIT_PATH}
       DISPLAY: $DISPLAY
     env_file:
       - ../default.env
@@ -19,6 +19,8 @@ services:
         - cuda-toolkit
       args:
         CUDA_TOOLKIT_VERSION: ${ENV_CUDA_TOOLKIT_VERSION}
+        USERNAME: ${ENV_USERNAME}
+        XDG_HOME: ${ENV_XDG_HOME}
     depends_on:
       xdg:
         required: true

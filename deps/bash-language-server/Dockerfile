@@ -1,15 +1,22 @@
 # syntax=docker/dockerfile:1.7-labs
 
 # Installs https://github.com/bash-lsp/bash-language-server
-# COPY --from=bash-language-server ${NVM_DIR} ${NVM_DIR}
 
 ARG NVM_DIR
+ARG USERNAME
 
 ################################################################################
-FROM node AS bash-language-server
+FROM xdg AS bash-language-server
 ################################################################################
 
 ARG NVM_DIR
+ARG USERNAME
+
+USER root
+
+COPY --from=node / /
+COPY --from=shellcheck / /
+COPY --from=bashate / /
 
 #-------------------------------------------------------------------------------
 # build dependencies
@@ -36,3 +43,5 @@ set -eu
 source ${NVM_DIR}/nvm.sh
 npm i -g bash-language-server
 EOF
+
+USER ${USERNAME}

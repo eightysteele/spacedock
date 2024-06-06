@@ -8,7 +8,7 @@ services:
     image: node
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_NODE_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_NODE_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -20,6 +20,7 @@ services:
         NVM_DIR: ${ENV_NVM_DIR}
         NVM_VERSION: ${ENV_NVM_VERSION}
         NODE_VERSION: ${ENV_NODE_VERSION}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

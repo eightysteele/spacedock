@@ -1,18 +1,18 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds dockerfile-language-server.
-#
-# COPY --from=docker-lsp ${NVM_DIR} ${NVM_DIR}
-#
-# https://github.com/rcjsuen/dockerfile-language-server
+# Builds https://github.com/rcjsuen/dockerfile-language-server
 
 ARG NVM_DIR
+ARG USERNAME
 
 ################################################################################
 FROM node AS docker-language-server
 ################################################################################
 
 ARG NVM_DIR
+ARG USERNAME
+
+USER root
 
 # ------------------------------------------------------------------------------
 # install build dependencies
@@ -46,3 +46,5 @@ npm install -g dockerfile-language-server-nodejs
 popd
 rm -rf dockerfile-language-server
 EOF
+
+USER ${USERNAME}

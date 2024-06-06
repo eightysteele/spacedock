@@ -1,16 +1,17 @@
 # syntax=docker/dockerfile:1.7-labs
 
-ARG GOROOT
+ARG USERNAME
 
 ################################################################################
 FROM xdg AS clojure-layer
 ################################################################################
 
-ARG GOROOT
-ENV GOBIN=${GOROOT}/bin
-ENV PATH=${GOBIN}:$PATH
+ARG USERNAME
+
+USER root
 
 COPY --from=clojure / /
 COPY --from=clj-kondo / /
 COPY --from=joker / /
 
+USER ${USERNAME} 

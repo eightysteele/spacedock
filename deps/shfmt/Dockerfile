@@ -4,6 +4,7 @@
 
 ARG GOROOT
 ARG GOBIN
+ARG USERNAME
 
 ################################################################################
 FROM go AS shfmt
@@ -11,6 +12,9 @@ FROM go AS shfmt
 
 ARG GOROOT
 ARG GOBIN
+ARG USERNAME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # build dependencies
@@ -37,3 +41,5 @@ set -eu
 export PATH=${GOBIN}:$PATH
 go install mvdan.cc/sh/v3/cmd/shfmt@latest
 EOF
+
+USER ${USERNAME}

@@ -4,11 +4,15 @@
 
 ARG GO_VERSION
 ARG GOROOT
+ARG USERNAME
 
 FROM xdg AS go
 
 ARG GO_VERSION
 ARG GOROOT
+ARG USERNAME
+
+USER root
 
 # install deps
 RUN bash -x <<"EOF"
@@ -32,3 +36,5 @@ d=$(dirname "${GOROOT}")
 tar -C $d -xzf $f
 rm $f
 EOF
+
+USER ${USERNAME}

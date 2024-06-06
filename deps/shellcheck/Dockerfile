@@ -9,6 +9,7 @@
 ARG CABAL_DIR
 ARG XDG_HOME
 ARG XDG_BIN_HOME
+ARG USERNAME
 
 ################################################################################
 FROM cabal AS shellcheck
@@ -17,6 +18,9 @@ FROM cabal AS shellcheck
 ARG CABAL_DIR
 ARG XDG_HOME
 ARG XDG_BIN_HOME
+ARG USERNAME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # build deps
@@ -47,3 +51,5 @@ cabal install ShellCheck
 popd
 rm -rf shellcheck
 EOF
+
+USER ${USERNAME}

@@ -5,6 +5,7 @@
 ARG PYTHON_MAJOR_VERSION
 ARG PYTHON_MINOR_VERSION
 ARG PYTHON_BUILD_NUMBER
+ARG USERNAME
 
 ################################################################################
 FROM xdg AS python
@@ -13,6 +14,9 @@ FROM xdg AS python
 ARG PYTHON_MAJOR_VERSION
 ARG PYTHON_MINOR_VERSION
 ARG PYTHON_BUILD_NUMBER
+ARG USERNAME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # build dependencies
@@ -78,3 +82,5 @@ update-alternatives --install /usr/bin/pip3 pip3 "/usr/local/bin/pip$v" 1
 update-alternatives --config python3
 update-alternatives --config pip3
 EOF
+
+USER ${USERNAME}

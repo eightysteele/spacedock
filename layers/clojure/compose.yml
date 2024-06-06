@@ -9,13 +9,15 @@ include:
 services:
   clojure-layer:
     image: clojure-layer
-    command: ${SPACEDOCK_DEVMODE:+tail -f /dev/null}
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_CLOJURE_LAYER_PATH}
     build:
       dockerfile: Dockerfile
       tags:
         - clojure-layer
       args:
-        GOROOT: ${ENV_GO_GOROOT}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

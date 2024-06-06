@@ -3,12 +3,16 @@
 # Installs jdk: https://adoptium.net/installation/linux/
 
 ARG JDK_MAJOR_VERSION
+ARG USERNAME
 
 ################################################################################
 FROM xdg AS jdk
 ################################################################################
 
 ARG JDK_MAJOR_VERSION
+ARG USERNAME
+
+USER root
 
 RUN bash -x <<"EOF"
 set -eu
@@ -37,3 +41,5 @@ apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
+
+USER ${USERNAME}

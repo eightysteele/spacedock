@@ -2,9 +2,15 @@
 
 # Installs clojure: https://clojure.org/guides/install_clojure#_linux_instructions
 
+ARG USERNAME
+
 ################################################################################
 FROM jdk AS clojure
 ################################################################################
+
+ARG USERNAME
+
+USER root
 
 # install deps
 RUN bash -x <<"EOF"
@@ -26,3 +32,5 @@ chmod +x linux-install.sh
 ./linux-install.sh
 rm linux-install.sh
 EOF
+
+USER ${USERNAME}

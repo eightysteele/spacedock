@@ -8,7 +8,7 @@ services:
     image: go
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_GOROOT}/bin:${ENV_XDG_PATH}
+      PATH: ${ENV_GO_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -19,6 +19,7 @@ services:
       args:
         GO_VERSION: ${ENV_GO_VERSION}
         GOROOT: ${ENV_GOROOT}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

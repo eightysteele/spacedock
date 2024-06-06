@@ -1,0 +1,29 @@
+# gh
+
+name: gh
+
+services:
+  gh-builder:
+    image: gh-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - ../default.env
+      - override.env
+    build:
+      target: gh-builder
+      tags:
+        - gh-builder:latest
+  gh-runtime:
+    image: gh-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - ../default.env
+      - override.env
+    build:
+      target: gh-runtime
+      tags:
+        - gh-runtime:latest
+    depends_on:
+      gh-builder:
+        required: true
+        condition: service_started

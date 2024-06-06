@@ -16,6 +16,8 @@ services:
       dockerfile: Dockerfile
       tags:
         - bashate
+      args:
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

@@ -1,14 +1,10 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Builds hadolint.
-#
-#  - $CABAL_DIR/bin/hadolint
-#
-# https://github.com/hadolint/hadolint
+# Builds hadolint: https://github.com/hadolint/hadolint
 
 ARG CABAL_DIR
-ARG XDG_HOME
-ARG XDG_BIN_HOME=${XDG_HOME}/.local/bin
+ARG XDG_BIN_HOME
+ARG USERNAME
 
 ################################################################################
 FROM shellcheck AS hadolint
@@ -16,6 +12,10 @@ FROM shellcheck AS hadolint
 
 ARG CABAL_DIR
 ARG XDG_BIN_HOME
+ARG USERNAME
+ARG USERNAME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # build deps
@@ -51,3 +51,5 @@ cabal install
 popd
 rm -rf hadolint
 EOF
+
+USER ${USERNAME}

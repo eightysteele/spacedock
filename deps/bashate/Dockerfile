@@ -2,9 +2,15 @@
 
 # Builds bashate: https://github.com/openstack/bashate
 
+ARG USERNAME
+
 ################################################################################
 FROM python AS bashate
 ################################################################################
+
+ARG USERNAME
+
+USER root
 
 # ------------------------------------------------------------------------------
 # build deps
@@ -34,3 +40,5 @@ popd
 rm -rf bashate
 echo ""
 EOF
+
+USER ${USERNAME}

@@ -1,6 +1,7 @@
 name: bash-language-server
 
 include:
+  - ../xdg/compose.yml
   - ../node/compose.yml
   - ../bashate/compose.yml
   - ../shellcheck/compose.yml
@@ -10,7 +11,7 @@ services:
     image: bash-language-server
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_BASH_LANGUAGE_SERVER_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_BASH_LANGUAGE_SERVER_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -20,7 +21,11 @@ services:
         - bash-language-server
       args:
         NVM_DIR: ${ENV_NVM_DIR}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
+      xdg:
+        required: true
+        condition: service_started
       node:
         required: true
         condition: service_started

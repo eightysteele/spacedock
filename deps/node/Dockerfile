@@ -9,6 +9,7 @@
 ARG NVM_DIR
 ARG NVM_VERSION
 ARG NODE_VERSION
+ARG USERNAME
 
 ################################################################################
 FROM xdg AS node
@@ -17,6 +18,9 @@ FROM xdg AS node
 ARG NVM_DIR
 ARG NVM_VERSION
 ARG NODE_VERSION
+ARG USERNAME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # build dependencies
@@ -47,3 +51,5 @@ nvm install $NODE_VERSION
 nvm use $NODE_VERSION
 nvm alias default $NODE_VERSION
 EOF
+
+USER ${USERNAME}

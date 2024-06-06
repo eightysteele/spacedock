@@ -1,6 +1,7 @@
 name: gpu-layer
 
 include:
+  - ../../deps/xdg/compose.yml
   - ../../deps/cuda-toolkit/compose.yml
   - ../../deps/llvm/compose.yml
 
@@ -9,7 +10,7 @@ services:
     image: gpu-layer
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_CUDA_TOOLKIT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_GPU_LAYER_PATH}
       DISPLAY: $DISPLAY
     env_file:
       - ../../deps/default.env
@@ -18,7 +19,12 @@ services:
       dockerfile: Dockerfile
       tags:
         - gpu-layer
+      args:
+        USERNAME: ${ENV_USERNAME}
     depends_on:
+      xdg:
+        required: true
+        condition: service_started
       cuda-toolkit:
         required: true
         condition: service_started

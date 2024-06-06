@@ -1,6 +1,7 @@
 name: docker-layer
 
 include:
+  - ../../deps/xdg/compose.yml
   - ../../deps/hadolint/compose.yml
   - ../../deps/docker-language-server/compose.yml
 
@@ -9,7 +10,7 @@ services:
     image: docker-layer
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_NODE_PATH}:${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_DOCKER_LAYER_PATH}
       DISPLAY: $DISPLAY
     env_file:
       - ../../deps/default.env
@@ -18,7 +19,12 @@ services:
       dockerfile: Dockerfile
       tags:
         - docker-layer
+      args:
+        USERNAME: ${ENV_USERNAME}
     depends_on:
+      xdg:
+        required: true
+        condition: service_started
       hadolint:
         required: true
         condition: service_started

@@ -1,24 +1,42 @@
+# emacs
+
 name: emacs
 
-include:
-  - ../xdg/compose.yml
-
 services:
-  emacs:
-    image: emacs
+  emacs-builder:
+    image: emacs-builder:latest
     command: /usr/bin/tail -f /dev/null
-    environment:
-      PATH: ${ENV_XDG_PATH}
     env_file:
       - ../default.env
       - override.env
     build:
-      dockerfile: Dockerfile
+      target: emacs-builder
       tags:
-        - emacs
+        - emacs-builder:latest
       args:
-        EMACS_VERSION: ${ENV_EMACS_VERSION}
+        EMACS_VERSION: ${SPOK_EMACS_VERSION}
+  emacs-runtime:
+    image: emacs-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      DISPLAY: $DISPLAY
+    env_file:
+      - ../default.env
+      - override.env
+    build:
+      target: emacs-runtime
+      tags:
+        - emacs-runtime:latest
+      args:
+        EMACS_VERSION: ${SPOK_EMACS_VERSION}
     depends_on:
-      xdg:
+      emacs-builder:
         required: true
         condition: service_started
+    stdin_open: true
+    tty: true
+    shm_size: 2g
+    privileged: true
+    volumes:
+      - ${SPOK_X_SERVER_VOLUME}
+

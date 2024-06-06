@@ -7,21 +7,35 @@ TAG=emacs-docker:dev
 COMMAND=""
 COMMAND_PATH=""
 
-get_service() {
-	local service=""
+get_project() {
 	local type=$(dirname "$COMMAND_PATH")
-	local service=$(basename "$COMMAND_PATH")
+	local project=$(basename "$COMMAND_PATH")
 	if [ "$type" == "layers" ]; then
-		service="$service-layer"
+		project="$project-layer"
+	elif [ "$type" == "runtimes" ]; then
+		project="$project"
 	fi
-	echo "$service"
+	echo "$project"
+}
+
+get_service() {
+	shift 2
+	echo "$1"
+}
+
+get_command() {
+	shift 3
+	command="${1:-/bin/bash}"
+	echo "$command"
 }
 
 get_env_files() {
 	local env_files=""
 	local type=$(dirname "$COMMAND_PATH")
 	if [ "$type" == "layers" ]; then
-		env_files="--env-file ../../deps/default.env --env-file override.env"
+		env_files="--env-file ../../deps/default.env --env-file ../../layers/default.env --env-file override.env"
+	elif [ "$type" == "runtimes" ]; then
+		env_files="--env-file ../../deps/default.env --env-file ../../layers/default.env --env-file ../default.env --env-file override.env"
 	else
 		env_files="--env-file ../default.env --env-file override.env"
 	fi
@@ -55,7 +69,7 @@ get_include_env_paths() {
 }
 
 compose_build() {
-	local service=$(get_service)
+	local service=$(get_project)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
 	local cmd="docker compose --env-file ../default.env --env-file override.env -p $service build"
 	printf "\n%s\n\n" "$cmd"
@@ -64,61 +78,84 @@ compose_build() {
 }
 
 compose_start() {
-	local service=$(get_service)
+	local project=$(get_project)
+	local service=$(get_service "$@")
+	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	local cmd="docker compose --env-file ../default.env --env-file override.env -p $service start"
+	local cmd="docker compose $env_files -p $project start $project-$service"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
 
 compose_up() {
-	local service=$(get_service)
+	local service=$(get_service "$@")
+	local project=$(get_project)
 	local env_files=$(get_env_files)
-	compose_config
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	local cmd="docker compose $env_files -p $service up -d --build --remove-orphans"
+	local cmd="docker compose $env_files -p $project up -d --build --remove-orphans $project-$service"
+	printf "\n%s\n\n" "$cmd"
+	$cmd
+	popd
+}
+
+compose_run() {
+	local service=$(get_service "$@")
+	local project=$(get_project)
+	local env_files=$(get_env_files)
+	pushd "$SCRIPT_DIR/$COMMAND_PATH"
+	local cmd="docker compose $env_files -p $project run --build --remove-orphans $project-$service"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
 
 compose_stop() {
-	service=$(get_service)
+	local service=$(get_service "$@")
+	local project=$(get_project)
+	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	docker compose --env-file ../../utils/.env -p "$service" stop
+	cmd="docker compose $env_files -p $project stop $project-$service"
+	printf "\n%s\n\n" "$cmd"
+	$cmd
 	popd
 }
 
 compose_exec() {
-	service=$(get_service)
+	command=$(get_command "$@")
+	service=$(get_service "$@")
+	project=$(get_project)
 	env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	cmd="docker compose $env_files exec $service /bin/bash"
+	cmd="docker compose -p $project $env_files exec $project-$service $command"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
 
 compose_config() {
-	service=$(get_service)
+	project=$(get_project)
 	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	cmd="docker compose $env_files config"
+	cmd="docker compose -p $project $env_files config"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
 	popd
 }
 
 compose_rm() {
-	local service=$(get_service)
+	local service=$(get_project)
+	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
-	docker compose --env-file ../../utils/.env -p "$service" rm
+	cmd="docker compose $env_files rm $service"
+	printf "\n%s\n\\n" "$cmd"
+	$cmd
 	popd
 }
 
 compose_ps() {
-	local service=$(get_service)
+	local service=$(get_project)
+	local env_files=$(get_env_files)
 	pushd "$SCRIPT_DIR/$COMMAND_PATH"
 	cmd="docker compose -p $service ps -a"
 	printf "\n%s\n\n" "$cmd"
@@ -152,6 +189,9 @@ interpret() {
 	:config)
 		compose_config "$@"
 		;;
+	:run)
+		compose_run "$@"
+		;;
 	*)
 		echo "unknown command $COMMAND"
 		exit 1
@@ -160,7 +200,7 @@ interpret() {
 }
 
 parse() {
-	args=$(getopt -o h --long build:,up:,start:,stop:,exec:,rm:,ps:,config: -- "$@")
+	args=$(getopt -o h --long build:,up:,start:,stop:,exec:,rm:,ps:,config:,run: -- "$@")
 	if [[ $? -ne 0 ]]; then
 		exit 1
 	fi
@@ -204,6 +244,11 @@ parse() {
 			;;
 		--config)
 			COMMAND=:config
+			COMMAND_PATH="$2"
+			shift 2
+			;;
+		--run)
+			COMMAND=:run
 			COMMAND_PATH="$2"
 			shift 2
 			;;

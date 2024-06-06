@@ -18,6 +18,7 @@ services:
         - llvm
       args:
         LLVM_VERSION: ${ENV_LLVM_VERSION}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       xdg:
         required: true

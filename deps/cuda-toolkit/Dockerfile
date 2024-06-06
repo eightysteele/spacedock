@@ -4,10 +4,17 @@
 
 ARG CUDA_TOOLKIT_VERSION
 ARG CUDA_IMAGE=nvcr.io/nvidia/cuda:${CUDA_TOOLKIT_VERSION}-devel-ubuntu20.04
+ARG USERNAME
+ARG XDG_HOME
 
 ################################################################################
 FROM ${CUDA_IMAGE} AS cuda-toolkit
 ################################################################################
+
+ARG USERNAME
+ARG XDG_HOME
+
+USER root
 
 #-------------------------------------------------------------------------------
 # nsight compute qt deps for x11: https://doc.qt.io/qt-6/linux-requirements.html
@@ -18,7 +25,10 @@ set -eu
 export TZ="America/Los_Angeles"
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 apt update
-apt install -y \
+apt install -y --no-install-recommends \
+    sudo
+apt update
+apt install -y --no-install-recommends \
     ca-certificates \
     build-essential \
     libgl1 \
@@ -73,3 +83,19 @@ apt-get clean
 apt-get autoremove -y
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
 EOF
+
+# ------------------------------------------------------------------------------
+# recreate xdg and user (since this image isn't based on xgd image)
+
+COPY --from=xdg ${XDG_HOME} ${XDG_HOME}
+
+RUN bash -x <<"EOF"
+set -eu
+useradd --create-home ${USERNAME}
+usermod -aG sudo ${USERNAME}
+echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
+EOF
+
+USER ${USERNAME}
+

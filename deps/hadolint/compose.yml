@@ -8,7 +8,7 @@ services:
     image: hadolint
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_HADOLINT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_HADOLINT_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -19,6 +19,7 @@ services:
       args:
         XDG_BIN_HOME: ${ENV_XDG_BIN_HOME}
         CABAL_DIR: ${ENV_CABAL_DIR}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       shellcheck:
         required: true

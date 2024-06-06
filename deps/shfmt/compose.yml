@@ -8,7 +8,7 @@ services:
     image: shfmt
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_SHFMT_PATH}:${ENV_XDG_PATH}
+      PATH: ${ENV_SHFMT_PATH}
     env_file:
       - ../default.env
       - override.env
@@ -19,6 +19,7 @@ services:
       args:
         GOROOT: ${ENV_GOROOT}
         GOBIN: ${ENV_GOBIN}
+        USERNAME: ${ENV_USERNAME}
     depends_on:
       go:
         required: true
