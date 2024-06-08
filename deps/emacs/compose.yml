@@ -1,5 +1,3 @@
-# emacs
-
 name: emacs
 
 services:
@@ -7,8 +5,7 @@ services:
     image: emacs-builder:latest
     command: /usr/bin/tail -f /dev/null
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
       target: emacs-builder
       tags:
@@ -21,8 +18,7 @@ services:
     environment:
       DISPLAY: $DISPLAY
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
       target: emacs-runtime
       tags:

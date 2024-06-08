@@ -1,5 +1,3 @@
-# gh
-
 name: gh
 
 services:
@@ -7,8 +5,7 @@ services:
     image: gh-builder:latest
     command: /usr/bin/tail -f /dev/null
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
       target: gh-builder
       tags:
@@ -17,8 +14,7 @@ services:
     image: gh-runtime:latest
     command: /usr/bin/tail -f /dev/null
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
       target: gh-runtime
       tags:

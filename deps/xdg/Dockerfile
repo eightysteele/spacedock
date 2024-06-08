@@ -50,11 +50,6 @@ useradd --create-home ${USERNAME}
 usermod -aG sudo ${USERNAME}
 echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
-
-#useradd --create-home ${USERNAME}
-#useradd -m -s /bin/bash ${USERNAME}
-#usermod -aG sudo ${USERNAME}
-#echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 EOF
 
 USER ${USERNAME}

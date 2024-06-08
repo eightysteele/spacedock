@@ -1,0 +1,6 @@
+# where a package got installed
+dpkg -L temurin-21-jdk
+
+# build and runtime deps
+# make sure /etc/apt/sources.list.d /etc/apt/sources.list have deb-src uncommented
+apt-rdepends -p -b temurin-21-jdk

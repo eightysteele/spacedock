@@ -1,21 +1,16 @@
 # syntax=docker/dockerfile:1.7-labs
-# emmy runtime
+# spok runtime
 
 ARG USERNAME
 
 # ------------------------------------------------------------------------------
-FROM ubuntu:22.04 AS emmy-runtime
+FROM spok-layer AS spok-runtime
 # ------------------------------------------------------------------------------
 
 ARG USERNAME
 
-COPY --from=brave-runtime / /
-COPY --from=gh-runtime / /
-COPY --from=emacs-runtime / /
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-
-RUN bash -xeu <<"EOF" # install runtime deps
-set -xeu
+RUN bash -x <<"EOF" # install spok runtime
+set -eu
 apt update
 apt install -y --no-install-recommends \
     sudo \
@@ -33,9 +28,8 @@ echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
 EOF
 
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chown ${USERNAME}:${USERNAME} /usr/local/bin/entrypoint.sh
 USER ${USERNAME}
 WORKDIR /home/${USERNAME}
-
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-

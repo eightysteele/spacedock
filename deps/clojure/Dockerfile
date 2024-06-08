@@ -1,36 +1,29 @@
 # syntax=docker/dockerfile:1.7-labs
+# clojure: https://clojure.org/guides/install_clojure#_linux_instructions
 
-# Installs clojure: https://clojure.org/guides/install_clojure#_linux_instructions
+# ------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS clojure-builder
 
-ARG USERNAME
+ADD tools.sh /usr/local/bin/tools.sh
+RUN tools.sh --install-build-deps
+RUN tools.sh --build
 
-################################################################################
-FROM jdk AS clojure
-################################################################################
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS clojure-runtime
 
-ARG USERNAME
-
-USER root
-
-# install deps
+COPY --from=clojure-builder / /build/
+ADD tools.sh /usr/local/bin/tools.sh
 RUN bash -x <<"EOF"
-set -eu
-apt-get update
-apt-get install -y --no-install-recommends \
-    curl \
-    rlwrap
-apt-get clean
-apt-get autoremove -y
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+tools.sh --install-runtime-deps
+tools.sh --copy-build-artifacts
+rm -rf /build
 EOF
 
-# install clojure
+COPY --from=jdk-builder / /build/
+ADD jdk-tools.sh /usr/local/bin/jdk-tools.sh
 RUN bash -x <<"EOF"
-set -eu
-curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
-chmod +x linux-install.sh
-./linux-install.sh
-rm linux-install.sh
+jdk-tools.sh --install-runtime-deps
+jdk-tools.sh --copy-build-artifacts
+rm -rf /build
 EOF
 
-USER ${USERNAME}

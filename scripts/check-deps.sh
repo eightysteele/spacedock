@@ -3,7 +3,7 @@
 set -eu
 
 # File containing the list of dependencies
-DEPS_FILE=/brave-runtime-deps.txt
+DEPS_FILE="$1"
 
 if [[ ! -f "$DEPS_FILE" ]]; then
 	echo "Dependencies file not found: $DEPS_FILE"

@@ -1,0 +1,22 @@
+# Show build dependencies for brave-browser
+# requires source code or deb-src in packages.lists
+apt-get source brave-browser
+cd brave-browser-*
+cat debian/control | grep Build-Depends
+
+# when compiling from source
+sudo apt-get build-dep brave-browser
+
+
+# Install the package
+apt-get update && apt-get install -y brave-browser
+
+# Show package dependencies
+apt-cache depends brave-browser
+
+# List installed files for the package
+dpkg -L brave-browser
+
+
+# shared libs
+ldd /usr/bin/brave-browser

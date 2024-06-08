@@ -4,21 +4,28 @@ include:
   - ../jdk/compose.yml
 
 services:
-  clojure:
-    image: clojure
+  clojure-builder:
+    image: clojure-builder:latest
     command: /usr/bin/tail -f /dev/null
-    environment:
-      PATH: ${ENV_CLOJURE_PATH}
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
-      dockerfile: Dockerfile
+      target: clojure-builder
       tags:
-        - clojure
-      args:
-        USERNAME: ${ENV_USERNAME}
+        - clojure-builder:latest
+  clojure-runtime:
+    image: clojure-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      target: clojure-runtime
+      tags:
+        - clojure-runtime:latest
     depends_on:
-      jdk:
+      clojure-builder:
+        required: true
+        condition: service_started
+      jdk-builder:
         required: true
         condition: service_started
