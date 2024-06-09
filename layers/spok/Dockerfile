@@ -10,27 +10,27 @@ FROM clojure-layer AS spok-layer
 # emacs
 ARG EMACS_VERSION
 COPY --from=emacs-builder / /build/
-ADD tools.sh /usr/local/bin/tools.sh
+COPY deps/emacs/tools.sh /usr/local/bin/emacs-tools.sh
 RUN bash -x <<"EOF"
-tools.sh --install-runtime-deps
-tools.sh --copy-build-artifacts
+emacs-tools.sh --install-runtime-deps
+emacs-tools.sh --copy-build-artifacts
 rm -rf /build
 EOF
 
 # gh
 COPY --from=gh-builder / /build/
-ADD tools.sh /usr/local/bin/tools.sh
+COPY deps/gh/tools.sh /usr/local/bin/gh-tools.sh
 RUN bash -x <<"EOF"
-tools.sh --install-runtime-deps
-tools.sh --copy-build-artifacts
+gh-tools.sh --install-runtime-deps
+gh-tools.sh --copy-build-artifacts
 rm -rf /build
 EOF
 
 # brave
 COPY --from=brave-builder / /build/
-ADD tools.sh /usr/local/bin/tools.sh
+COPY deps/brave/tools.sh /usr/local/bin/brave-tools.sh
 RUN bash -x <<"EOF"
-tools.sh --install-runtime-deps
-tools.sh --copy-build-artifacts
+brave-tools.sh --install-runtime-deps
+brave-tools.sh --copy-build-artifacts
 rm -rf /build
 EOF

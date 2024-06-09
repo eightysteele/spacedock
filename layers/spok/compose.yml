@@ -1,0 +1,34 @@
+name: spok-layer
+
+include:
+  - ../../deps/brave/compose.yml
+  - ../../deps/gh/compose.yml
+  - ../../deps/emacs/compose.yml
+  - ../../deps/jdk/compose.yml
+  - ../clojure/compose.yml
+
+services:
+  spok-layer:
+    image: spok-layer:latest
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: layers/spok/Dockerfile
+      tags:
+        - spok-layer:latest
+      args:
+        EMACS_VERSION: ${SPOK_EMACS_VERSION}
+    depends_on:
+      clojure-layer:
+        required: true
+        condition: service_started
+      brave-runtime:
+        required: true
+        condition: service_started
+      gh-runtime:
+        required: true
+        condition: service_started
+      emacs-runtime:
+        required: true
+        condition: service_started

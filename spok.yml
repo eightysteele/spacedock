@@ -1,10 +1,7 @@
 name: spok
 
 include:
-  - deps/brave/compose.yml
-  - deps/gh/compose.yml
-  - deps/emacs/compose.yml
-  - deps/jdk/compose.yml
+  - layers/spok/compose.yml
 
 services:
     spok-runtime:
@@ -38,42 +35,5 @@ services:
       volumes:
         - home:/home/${SPOK_USERNAME}
         - ${SPOK_X_SERVER_VOLUME}
-    spok-layer:
-      image: spok-layer:latest
-      env_file:
-        - spok.env
-      build:
-        dockerfile: layers/spok/Dockerfile
-        tags:
-          - spok-layer:latest
-        args:
-          EMACS_VERSION: ${SPOK_EMACS_VERSION}
-      depends_on:
-        clojure-layer:
-          required: true
-          condition: service_started
-        brave-runtime:
-          required: true
-          condition: service_started
-        gh-runtime:
-          required: true
-          condition: service_started
-        emacs-runtime:
-          required: true
-          condition: service_started
-    clojure-layer:
-      image: clojure-layer:latest
-      env_file:
-        - spok.env
-      build:
-        dockerfile: layers/clojure/Dockerfile
-        tags:
-          - clojure-layer:latest
-        args:
-          JDK_VERSION: ${SPOK_JDK_VERSION}
-      depends_on:
-        jdk-runtime:
-          required: true
-          condition: service_started
 volumes:
   home:

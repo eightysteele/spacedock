@@ -2,8 +2,8 @@
 
 set -e
 
-FOO_SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-ROOT=$(dirname "$FOO_SCRIPT_DIR")
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+ROOT=$(dirname "$SCRIPT_DIR")
 COMMAND=""
 COMMAND_PATH=""
 
@@ -50,24 +50,6 @@ stop_containers() {
 	fi
 }
 
-get_include_env_paths() {
-	local yaml_file=$1
-	local include_paths=()
-
-	while IFS= read -r line; do
-		if [[ $line =~ ^[[:space:]]*-[[:space:]]*(.*) ]]; then
-			dir_path=$(dirname "${BASH_REMATCH[1]}")
-			include_paths+=("$dir_path/.env")
-		fi
-	done < <(awk '/^include:/,/^$/' "$yaml_file")
-
-	local result=""
-	for path in "${include_paths[@]}"; do
-		result+="--env-file $path "
-	done
-	echo "$result"
-}
-
 compose_build() {
 	local service=$(get_project)
 	pushd "$ROOT/$COMMAND_PATH"
@@ -88,99 +70,7 @@ compose_start() {
 	popd
 }
 
-copy_tools() {
-	local paths="$1"
-	echo "paths: $paths"
-	for path in $paths; do
-		local basename=$(basename "$path")
-		local src="../$basename/tools.sh"
-		local dest="$basename-tools.sh"
-		echo "copying $src to $dest"
-		if ! cp "$src" "$dest" 2>/dev/null; then
-			echo "skipped $src..."
-		fi
-	done
-}
-
-copy-spok-tools() {
-	local paths="$1"
-	echo "paths: $paths"
-	for path in $paths; do
-		local basename=$(basename "$path")
-		local src="$path/tools.sh"
-		for p in $paths; do
-			if [[ $path != $p ]]; then
-				local dest="$p/$basename-tools.sh"
-				echo "copying $src to $dest"
-				#if ! cp "$src" "$dest" 2>/dev/null; then
-			#		echo "skipped $src..."
-			#	fi
-			fi
-		done
-	done
-}
-
-get-dep-paths() {
-	local dir="deps"
-	local dir_list=""
-
-	# Check if the directory exists
-	if [[ -d "$dir" ]]; then
-		# Loop through each file in the directory
-		for file in "$dir"/*; do
-			# Check if the file is a directory
-			if [[ -d "$file" ]]; then
-				# Append the directory name to the list
-				dir_list+="deps/${file##*/} "
-			fi
-		done
-	else
-		echo "Directory does not exist."
-		return 1
-	fi
-
-	# Trim the trailing space and return the list
-	echo "${dir_list% }"
-}
-
-delete-tools-files() {
-	rm -f ./*-tools.sh
-	echo "Deleted all *-tools.sh files in the current directory."
-}
-
-get-spok-deps() {
-	local dep_paths=$(get-dep-paths)
-	copy-spok-tools "$dep_paths"
-}
-
-delete-spok-deps() {
-	local dep_paths=$(get-dep-paths)
-	echo "PATHS $dep_paths"
-	for path in $dep_paths; do
-		local basename=$(basename "$path")
-		local src="$path/tools.sh"
-		for p in $dep_paths; do
-			if [[ $path != $p ]]; then
-				local dest="$p/$basename-tools.sh"
-				echo "deleting $dest"
-				#if ! cp "$src" "$dest" 2>/dev/null; then
-				#		echo "skipped $src..."
-				#	fi
-			fi
-		done
-	done
-}
-
-get_deps() {
-	shift 1
-	pushd "$1"
-	shift 2
-	copy_tools "$@"
-	popd
-}
-
 compose_up() {
-	get_deps "$@"
 	local service=$(get_service "$@")
 	local project=$(get_project)
 	local env_files=$(get_env_files)
@@ -189,7 +79,6 @@ compose_up() {
 	local cmd="docker compose --progress plain $env_files -p $project up -d --build --remove-orphans $project-$service"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
-	delete-tools-files
 	popd
 }
 
@@ -198,11 +87,9 @@ compose_run() {
 	local service=$(get_service "$@")
 	local project=$(get_project)
 	local env_files=$(get_env_files)
-	get-spok-deps
-	local cmd="docker compose -f spok.yml $env_files -p $project run --build --remove-orphans $project-$service"
+	local cmd="docker compose --progress plain -f spok.yml $env_files -p $project run --build --remove-orphans $project-$service"
 	printf "\n%s\n\n" "$cmd"
-	#$cmd
-	delete-spok-deps
+	$cmd
 }
 
 compose_stop() {

@@ -4,15 +4,17 @@
 # ------------------------------------------------------------------------------
 FROM ubuntu:22.04 AS clojure-builder
 
-ADD tools.sh /usr/local/bin/tools.sh
-RUN tools.sh --install-build-deps
-RUN tools.sh --build
+COPY deps/clojure/tools.sh /usr/local/bin/tools.sh
+RUN bash -x <<"EOF"
+tools.sh --install-build-deps
+tools.sh --build
+EOF
 
 #-------------------------------------------------------------------------------
 FROM ubuntu:22.04 AS clojure-runtime
 
 COPY --from=clojure-builder / /build/
-ADD tools.sh /usr/local/bin/tools.sh
+COPY deps/clojure/tools.sh /usr/local/bin/tools.sh
 RUN bash -x <<"EOF"
 tools.sh --install-runtime-deps
 tools.sh --copy-build-artifacts
@@ -20,7 +22,7 @@ rm -rf /build
 EOF
 
 COPY --from=jdk-builder / /build/
-ADD jdk-tools.sh /usr/local/bin/jdk-tools.sh
+COPY deps/jdk/tools.sh /usr/local/bin/jdk-tools.sh
 RUN bash -x <<"EOF"
 jdk-tools.sh --install-runtime-deps
 jdk-tools.sh --copy-build-artifacts

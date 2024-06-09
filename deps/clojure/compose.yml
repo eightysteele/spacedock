@@ -10,6 +10,8 @@ services:
     env_file:
       - .env
     build:
+      context: ../../
+      dockerfile: deps/clojure/Dockerfile
       target: clojure-builder
       tags:
         - clojure-builder:latest
@@ -19,6 +21,8 @@ services:
     env_file:
       - .env
     build:
+      context: ../../
+      dockerfile: deps/clojure/Dockerfile
       target: clojure-runtime
       tags:
         - clojure-runtime:latest

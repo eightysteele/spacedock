@@ -7,6 +7,8 @@ services:
     env_file:
       - .env
     build:
+      context: ../../
+      dockerfile: deps/jdk/Dockerfile
       target: jdk-builder
       tags:
         - jdk-builder:latest
@@ -20,6 +22,8 @@ services:
     environment:
       LD_LIBRARY_PATH: ${SPOK_JDK_LD_LIBRARY_PATH}
     build:
+      context: ../../
+      dockerfile: deps/jdk/Dockerfile
       target: jdk-runtime
       tags:
         - jdk-runtime:latest
