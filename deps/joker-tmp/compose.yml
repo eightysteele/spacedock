@@ -1,0 +1,27 @@
+name: joker
+
+include:
+  - ../go/compose.yml
+
+services:
+  joker:
+    image: joker
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${ENV_JOKER_PATH}
+      GOBIN: ${ENV_GOBIN}
+    env_file:
+      - ../default.env
+      - override.env
+    build:
+      dockerfile: Dockerfile
+      tags:
+        - joker
+      args:
+        GOROOT: ${ENV_GOROOT}
+        GOBIN: ${ENV_GOBIN}
+        USERNAME: ${ENV_USERNAME}
+    depends_on:
+      go:
+        required: true
+        condition: service_started

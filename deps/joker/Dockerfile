@@ -1,43 +1,48 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs joker: https://github.com/candid82/joker
+# joker https://github.com/candid82/joker
 
-ARG GOROOT
+ARG PATH
 ARG GOBIN
-ARG USERNAME
-
-FROM go AS joker
-
 ARG GOROOT
+
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS joker-builder
+
+ARG PATH
 ARG GOBIN
-ARG USERNAME
+ARG GOROOT
 
-USER root
-
-# install deps
+COPY --from=go-builder / /go-build/
+COPY deps/go/tools.sh /usr/local/bin/go-tools.sh
 RUN bash -x <<"EOF"
-set -eu
-apt-get update
-apt-get install -y --no-install-recommends \
-    ca-certificates \
-    build-essential \
-    git
-apt-get clean
-apt-get autoremove -y
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+go-tools.sh --install-runtime-deps
+go-tools.sh --copy-build-artifacts
+rm -rf /go-build
 EOF
 
-# install joker
+COPY deps/joker/tools.sh /usr/local/bin/joker-tools.sh
 RUN bash -x <<"EOF"
-set -eu
-export GOROOT=${GOROOT}
-export GOBIN=${GOBIN}
-export PATH=$GOBIN:$PATH
-git clone https://github.com/candid82/joker.git
-pushd joker
-./run.sh --version && go install
-popd
-rm -rf joker
+joker-tools.sh --install-build-deps
+joker-tools.sh --build
+rm -rf /go-build
 EOF
 
-USER ${USERNAME}
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS joker-runtime
+
+COPY --from=go-builder / /go-build/
+COPY deps/go/tools.sh /usr/local/bin/go-tools.sh
+RUN bash -x <<"EOF"
+go-tools.sh --install-runtime-deps
+go-tools.sh --copy-build-artifacts
+rm -rf /go-build
+EOF
+
+COPY --from=joker-builder / /joker-build/
+COPY deps/joker/tools.sh /usr/local/bin/joker-tools.sh
+RUN bash -x <<"EOF"
+joker-tools.sh --install-runtime-deps
+joker-tools.sh --copy-build-artifacts
+rm -rf /joker-build
+EOF

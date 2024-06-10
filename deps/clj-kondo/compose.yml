@@ -1,24 +1,29 @@
 name: clj-kondo
 
-include:
-  - ../xdg/compose.yml
-
 services:
-  clj-kondo:
-    image: clj-kondo
+  clj-kondo-builder:
+    image: clj-kondo-builder:latest
     command: /usr/bin/tail -f /dev/null
-    environment:
-      PATH: ${ENV_CLJ_KONDO_PATH}
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: deps/clj-kondo/Dockerfile
+      target: clj-kondo-builder
       tags:
-        - clj-kondo
-      args:
-        USERNAME: ${ENV_USERNAME}
+        - clj-kondo-builder:latest
+  clj-kondo-runtime:
+    image: clj-kondo-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/clj-kondo/Dockerfile
+      target: clj-kondo-runtime
+      tags:
+        - clj-kondo-runtime:latest
     depends_on:
-      xdg:
+      clj-kondo-builder:
         required: true
         condition: service_started

@@ -47,11 +47,11 @@ install-runtime-deps() {
 
 copy-build-artifacts() {
 	cp -dv \
-		/build/usr/bin/gh \
+		/gh-build/usr/bin/gh \
 		/usr/bin/
 
 	cp -dv \
-		/build/usr/share/bash-completion/completions/gh \
+		/gh-build/usr/share/bash-completion/completions/gh \
 		/usr/share/bash-completion/completions/
 }
 

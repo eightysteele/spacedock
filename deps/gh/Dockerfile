@@ -12,8 +12,8 @@ RUN tools.sh --build
 #-------------------------------------------------------------------------------
 FROM ubuntu:22.04 AS gh-runtime
 
-COPY --from=gh-builder / /build/
-ADD tools.sh /usr/local/bin/tools.sh
-RUN tools.sh --install-runtime-deps
-RUN tools.sh --copy-build-artifacts
-RUN rm -rf /build
+COPY --from=gh-builder / /gh-build/
+ADD tools.sh /usr/local/bin/gh-tools.sh
+RUN gh-tools.sh --install-runtime-deps
+RUN gh-tools.sh --copy-build-artifacts
+RUN rm -rf /gh-build

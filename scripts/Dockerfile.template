@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1.7-labs
+# 
+
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS FOO-builder
+
+COPY deps/FOO/tools.sh /usr/local/bin/tools.sh
+RUN bash -x <<"EOF"
+tools.sh --install-build-deps
+tools.sh --build
+EOF
+
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS FOO-runtime
+
+COPY --from=FOO-builder / /build/
+
+COPY deps/FOO/tools.sh /usr/local/bin/tools.sh
+RUN bash -x <<"EOF"
+tools.sh --install-runtime-deps
+tools.sh --copy-build-artifacts
+rm -rf /build
+EOF

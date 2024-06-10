@@ -17,8 +17,8 @@ FROM ubuntu:22.04 AS emacs-runtime
 
 ARG EMACS_VERSION
 
-COPY --from=emacs-builder / /build/
-ADD tools.sh /usr/local/bin/tools.sh
-RUN tools.sh --install-runtime-deps
-RUN tools.sh --copy-build-artifacts
-RUN rm -rf /build
+COPY --from=emacs-builder / /emacs-build/
+ADD tools.sh /usr/local/bin/emacs-tools.sh
+RUN emacs-tools.sh --install-runtime-deps
+RUN emacs-tools.sh --copy-build-artifacts
+RUN rm -rf /emacs-build

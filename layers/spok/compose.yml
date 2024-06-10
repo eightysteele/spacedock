@@ -1,11 +1,14 @@
 name: spok-layer
 
 include:
+  # tools
   - ../../deps/brave/compose.yml
   - ../../deps/gh/compose.yml
   - ../../deps/emacs/compose.yml
+  # clojure layer
   - ../../deps/jdk/compose.yml
-  - ../clojure/compose.yml
+  - ../../deps/clojure/compose.yml
+  - ../../deps/clj-kondo/compose.yml
 
 services:
   spok-layer:
@@ -20,9 +23,7 @@ services:
       args:
         EMACS_VERSION: ${SPOK_EMACS_VERSION}
     depends_on:
-      clojure-layer:
-        required: true
-        condition: service_started
+      # tools
       brave-runtime:
         required: true
         condition: service_started
@@ -30,5 +31,15 @@ services:
         required: true
         condition: service_started
       emacs-runtime:
+        required: true
+        condition: service_started
+      # clojure layer
+      jdk-runtime:
+        required: true
+        condition: service_started
+      clojure-runtime:
+        required: true
+        condition: service_started
+      clj-kondo-runtime:
         required: true
         condition: service_started

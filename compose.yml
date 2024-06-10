@@ -1,3 +1,5 @@
+# ./spok --run . runtime
+
 name: spok
 
 include:
@@ -7,6 +9,7 @@ services:
     spok-runtime:
       image: spok-runtime:latest
       environment:
+        PATH: ${SPOK_GOBIN}:${SPOK_XDG_PATH}
         DISPLAY: $DISPLAY
         BROSWER: /usr/bin/brave-browser
         HOME: /home/${SPOK_USERNAME}
@@ -16,7 +19,7 @@ services:
         SPACEMACSDIR: ${SPOK_SPACEMACSDIR}
         LD_LIBRARY_PATH: ${SPOK_JDK_LD_LIBRARY_PATH}
       env_file:
-        - spok.env
+        - .env
       build:
         tags:
           - spok-runtime:latest

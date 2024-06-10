@@ -63,32 +63,32 @@ install-runtime-deps() {
 
 copy-build-artifacts() {
 	cp -av \
-		/build/usr/lib/jvm \
+		/jdk-build/usr/lib/jvm \
 		/usr/lib/
 
 	cp -dv \
-		/build/etc/alternatives/java* \
+		/jdk-build/etc/alternatives/java* \
 		/etc/alternatives/
 
 	cp -dv \
-		/build/etc/alternatives/jar* \
+		/jdk-build/etc/alternatives/jar* \
 		/etc/alternatives/
 
 	cp -av \
-		/build/etc/ssl/certs/adoptium \
+		/jdk-build/etc/ssl/certs/adoptium \
 		/etc/ssl/certs/
 
 	cp -dv \
-		/build/usr/bin/java* \
+		/jdk-build/usr/bin/java* \
 		/usr/bin/
 
 	cp -dv \
-		/build/usr/bin/jar* \
+		/jdk-build/usr/bin/jar* \
 		/usr/bin/
 }
 
 usage() {
-	echo "Usage: $0 [--install-build-deps|--build|--install-runtime-deps]"
+	echo "Usage: $0 [--install-build-deps|--build|--install-runtime-deps|--copy-build-artifacts]"
 	exit "$1"
 }
 

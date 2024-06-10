@@ -73,39 +73,43 @@ install-runtime-deps() {
 
 copy-build-artifacts() {
 	cp -dv \
-		/build/etc/alternatives/brave-browser \
-		/build/etc/alternatives/gnome-www-browser \
-		/build/etc/alternatives/open \
-		/build/etc/alternatives/x-www-browser \
+		/brave-build/etc/alternatives/brave-browser \
+		/brave-build/etc/alternatives/gnome-www-browser \
+		/brave-build/etc/alternatives/open \
+		/brave-build/etc/alternatives/x-www-browser \
 		/etc/alternatives/
 
 	cp -av \
-		/build/opt/brave.com \
+		/brave-build/opt/brave.com \
 		/opt/
 
 	cp -dv \
-		/build/usr/bin/brave-browser \
-		/build/usr/bin/brave-browser-stable \
-		/build/usr/bin/x-www-browser \
+		/brave-build/usr/bin/brave-browser \
+		/brave-build/usr/bin/brave-browser-stable \
+		/brave-build/usr/bin/x-www-browser \
 		/usr/bin/
 
-	cp -dv \
-		/build/usr/share/appdata/brave-browser.appdata.xml \
-		/usr/share/appdata/
+	pushd /brave-build/usr/share
+	cp --parents -av \
+		appdata \
+		/usr/share
+	popd
+
+	pushd /brave-build/usr/share
+	cp --parents -av \
+		gnome-control-center \
+		/usr/share
+	popd
 
 	cp -dv \
-		/build/usr/share/gnome-control-center/default-apps/brave-browser.xml \
-		/usr/share/gnome-control-center/default-apps/
-
-	cp -dv \
-		/build/usr/share/menu/brave-browser.menu \
+		/brave-build/usr/share/menu/brave-browser.menu \
 		/usr/share/menu/
 
 	cp -dv \
-		/build/var/lib/dpkg/alternatives/brave-browser \
-		/build/var/lib/dpkg/alternatives/gnome-www-browser \
-		/build/var/lib/dpkg/alternatives/open \
-		/build/var/lib/dpkg/alternatives/x-www-browser \
+		/brave-build/var/lib/dpkg/alternatives/brave-browser \
+		/brave-build/var/lib/dpkg/alternatives/gnome-www-browser \
+		/brave-build/var/lib/dpkg/alternatives/open \
+		/brave-build/var/lib/dpkg/alternatives/x-www-browser \
 		/var/lib/dpkg/alternatives/
 }
 

@@ -110,26 +110,26 @@ install-runtime-deps() {
 
 copy-build-artifacts() {
 	cp -dv \
-		/build/usr/local/bin/emacs* \
-		/build/usr/local/bin/ctags \
-		/build/usr/local/bin/ebrowse \
-		/build/usr/local/bin/etags \
+		/emacs-build/usr/local/bin/emacs* \
+		/emacs-build/usr/local/bin/ctags \
+		/emacs-build/usr/local/bin/ebrowse \
+		/emacs-build/usr/local/bin/etags \
 		/usr/local/bin/
 
-	pushd /build/usr/local
+	pushd /emacs-build/usr/local
 	cp --parents -av \
 		libexec \
 		/usr/local
 	popd
 
-	pushd /build/usr/local/lib
+	pushd /emacs-build/usr/local/lib
 	cp --parents -av \
 		emacs \
 		/usr/local/lib
 	popd
 
 	cp -av \
-		/build/usr/local/share/emacs \
+		/emacs-build/usr/local/share/emacs \
 		/usr/local/share/
 }
 

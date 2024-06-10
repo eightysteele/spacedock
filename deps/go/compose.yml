@@ -1,26 +1,37 @@
 name: go
 
-include:
-  - ../xdg/compose.yml
-
 services:
-  go:
-    image: go
+  go-builder:
+    image: go-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/go/Dockerfile
+      target: go-builder
+      tags:
+        - go-builder:latest
+      args:
+        GO_VERSION: ${SPOK_GO_VERSION}
+        GOROOT: ${SPOK_GOROOT}
+  go-runtime:
+    image: go-runtime:latest
     command: /usr/bin/tail -f /dev/null
     environment:
-      PATH: ${ENV_GO_PATH}
+      PATH: ${SPOK_GO_PATH}
     env_file:
-      - ../default.env
-      - override.env
+      - .env
     build:
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: deps/go/Dockerfile
+      target: go-runtime
       tags:
-        - go
+        - go-runtime:latest
       args:
-        GO_VERSION: ${ENV_GO_VERSION}
-        GOROOT: ${ENV_GOROOT}
-        USERNAME: ${ENV_USERNAME}
+        GO_VERSION: ${SPOK_GO_VERSION}
+        GOROOT: ${SPOK_GOROOT}
     depends_on:
-      xdg:
+      go-builder:
         required: true
         condition: service_started

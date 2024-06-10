@@ -22,3 +22,22 @@ jdk-tools.sh --install-runtime-deps
 jdk-tools.sh --copy-build-artifacts
 rm -rf /build
 EOF
+
+# clj-kondo
+COPY --from=clj-kondo-builder / /build/
+COPY deps/clj-kondo/tools.sh /usr/local/bin/tools.sh
+RUN bash -x <<"EOF"
+tools.sh --install-runtime-deps
+tools.sh --copy-build-artifacts
+rm -rf /build
+EOF
+
+# go
+COPY --from=go-builder / /build/
+COPY deps/go/tools.sh /usr/local/bin/go-tools.sh
+RUN bash -x <<"EOF"
+go-tools.sh --install-runtime-deps
+go-tools.sh --copy-build-artifacts
+rm -rf /build
+EOF
+

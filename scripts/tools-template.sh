@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eu
+
 install-build-deps() {
 	true
 }
@@ -26,11 +28,11 @@ copy-build-artifacts() {
 }
 
 usage() {
-	echo "Usage: $0 [--install-build-deps|--build|--install-runtime-deps]"
+	echo "Usage: $0 [--install-build-deps|--build|--install-runtime-deps|--copy-build-artifacts]"
 	exit "$1"
 }
 
-args=$(getopt -o h --long install-build-deps,build,install-runtime-deps,help -- "$@")
+args=$(getopt -o h --long install-build-deps,build,install-runtime-deps,copy-build-artifacts,help -- "$@")
 if [[ $? -ne 0 ]]; then
 	exit 1
 fi
@@ -48,6 +50,10 @@ while true; do
 		;;
 	--install-runtime-deps)
 		install-runtime-deps
+		shift 1
+		;;
+	--copy-build-artifacts)
+		copy-build-artifacts
 		shift 1
 		;;
 	-h | --help)

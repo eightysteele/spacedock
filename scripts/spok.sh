@@ -35,9 +35,9 @@ get_env_files() {
 	if [ "$type" == "layers" ]; then
 		env_files="--env-file ../../deps/default.env --env-file ../../layers/default.env --env-file override.env"
 	elif [ "$type" == "." ]; then
-		env_files="--env-file spok.env"
+		env_files="--env-file .env"
 	else
-		env_files="--env-file ../../spok.env --env-file .env"
+		env_files="--env-file ../../.env --env-file .env"
 	fi
 	echo "$env_files"
 }
@@ -87,7 +87,7 @@ compose_run() {
 	local service=$(get_service "$@")
 	local project=$(get_project)
 	local env_files=$(get_env_files)
-	local cmd="docker compose --progress plain -f spok.yml $env_files -p $project run --build --remove-orphans $project-$service"
+	local cmd="docker compose --progress plain -f compose.yml $env_files -p $project run --build --remove-orphans $project-$service"
 	printf "\n%s\n\n" "$cmd"
 	$cmd
 }
@@ -146,8 +146,16 @@ compose_ps() {
 	popd
 }
 
+new-dep() {
+	local path="$ROOT/$COMMAND_PATH"
+	./scripts/new-dep.sh "$path"
+}
+
 interpret() {
 	case "$COMMAND" in
+	:new-dep)
+		new-dep "$@"
+		;;
 	:start)
 		compose_start "$@"
 		;;
@@ -183,13 +191,18 @@ interpret() {
 }
 
 parse() {
-	args=$(getopt -o h --long build:,up:,start:,stop:,exec:,rm:,ps:,config:,run: -- "$@")
+	args=$(getopt -o h --long new-dep:,build:,up:,start:,stop:,exec:,rm:,ps:,config:,run: -- "$@")
 	if [[ $? -ne 0 ]]; then
 		exit 1
 	fi
 	eval set -- "$args"
 	while [ : ]; do
 		case "$1" in
+		--new-dep)
+			COMMAND=:new-dep
+			COMMAND_PATH="$2"
+			shift 2
+			;;
 		--start)
 			COMMAND=:start
 			COMMAND_PATH="$2"

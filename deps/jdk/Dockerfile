@@ -9,10 +9,10 @@ FROM ubuntu:22.04 AS jdk-builder
 
 ARG JDK_VERSION
 
-COPY deps/jdk/tools.sh /usr/local/bin/tools.sh
+COPY deps/jdk/tools.sh /usr/local/bin/jdk-tools.sh
 RUN bash -x <<"EOF"
-tools.sh --install-build-deps
-tools.sh --build
+jdk-tools.sh --install-build-deps
+jdk-tools.sh --build
 EOF
 
 #-------------------------------------------------------------------------------
@@ -20,11 +20,11 @@ FROM ubuntu:22.04 AS jdk-runtime
 
 ARG JDK_VERSION
 
-COPY --from=jdk-builder / /build/
+COPY --from=jdk-builder / /jdk-build/
 
-COPY deps/jdk/tools.sh /usr/local/bin/tools.sh
+COPY deps/jdk/tools.sh /usr/local/bin/jdk-tools.sh
 RUN bash -x <<"EOF"
-tools.sh --install-runtime-deps
-tools.sh --copy-build-artifacts
-rm -rf /build
+jdk-tools.sh --install-runtime-deps
+jdk-tools.sh --copy-build-artifacts
+rm -rf /jdk-build
 EOF

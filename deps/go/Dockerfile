@@ -1,40 +1,29 @@
 # syntax=docker/dockerfile:1.7-labs
 
-# Installs go: https://github.com/golang/go
+# go https://github.com/golang/go
 
 ARG GO_VERSION
 ARG GOROOT
-ARG USERNAME
 
-FROM xdg AS go
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS go-builder
 
 ARG GO_VERSION
 ARG GOROOT
-ARG USERNAME
 
-USER root
-
-# install deps
+COPY deps/go/tools.sh /usr/local/bin/go-tools.sh
 RUN bash -x <<"EOF"
-set -eu
-apt-get update
-apt-get install -y --no-install-recommends \
-    ca-certificates \
-    build-essential \
-    wget
-apt-get clean
-apt-get autoremove -y
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/*
+go-tools.sh --install-build-deps
+go-tools.sh --build
 EOF
 
-# install go
-RUN bash -x <<"EOF"
-set -eu
-f=go${GO_VERSION}.linux-amd64.tar.gz
-wget https://golang.org/dl/$f
-d=$(dirname "${GOROOT}")
-tar -C $d -xzf $f
-rm $f
-EOF
+#-------------------------------------------------------------------------------
+FROM ubuntu:22.04 AS go-runtime
 
-USER ${USERNAME}
+COPY --from=go-builder / /go-build/
+COPY deps/go/tools.sh /usr/local/bin/go-tools.sh
+RUN bash -x <<"EOF"
+go-tools.sh --install-runtime-deps
+go-tools.sh --copy-build-artifacts
+rm -rf /go-build
+EOF

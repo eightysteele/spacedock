@@ -2,6 +2,7 @@ name: clojure-layer
 
 include:
   - ../../deps/jdk/compose.yml
+  - ../../deps/clj-kondo/compose.yml
 
 services:
   clojure-layer:
@@ -17,5 +18,8 @@ services:
         JDK_VERSION: ${SPOK_JDK_VERSION}
     depends_on:
       jdk-runtime:
+        required: true
+        condition: service_started
+      clj-kondo-runtime:
         required: true
         condition: service_started
