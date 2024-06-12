@@ -1,0 +1,35 @@
+name: clojure
+
+include:
+  - ../jdk/compose.yml
+
+services:
+  clojure-builder:
+    image: clojure-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/clojure/Dockerfile
+      target: clojure-builder
+      tags:
+        - clojure-builder:latest
+  clojure-runtime:
+    image: clojure-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/clojure/Dockerfile
+      target: clojure-runtime
+      tags:
+        - clojure-runtime:latest
+    depends_on:
+      clojure-builder:
+        required: true
+        condition: service_started
+      jdk-builder:
+        required: true
+        condition: service_started

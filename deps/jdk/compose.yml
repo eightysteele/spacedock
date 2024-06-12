@@ -1,0 +1,35 @@
+name: jdk
+
+services:
+  jdk-builder:
+    image: jdk-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/jdk/Dockerfile
+      target: jdk-builder
+      tags:
+        - jdk-builder:latest
+      args:
+        JDK_VERSION: ${SPOK_JDK_VERSION}
+  jdk-runtime:
+    image: jdk-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    environment:
+      LD_LIBRARY_PATH: ${SPOK_JDK_LD_LIBRARY_PATH}
+    build:
+      context: ../../
+      dockerfile: deps/jdk/Dockerfile
+      target: jdk-runtime
+      tags:
+        - jdk-runtime:latest
+      args:
+        JDK_VERSION: ${SPOK_JDK_VERSION}
+    depends_on:
+      jdk-builder:
+        required: true
+        condition: service_started

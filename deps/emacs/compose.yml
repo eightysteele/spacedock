@@ -1,0 +1,38 @@
+name: emacs
+
+services:
+  emacs-builder:
+    image: emacs-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      target: emacs-builder
+      tags:
+        - emacs-builder:latest
+      args:
+        EMACS_VERSION: ${SPOK_EMACS_VERSION}
+  emacs-runtime:
+    image: emacs-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      DISPLAY: $DISPLAY
+    env_file:
+      - .env
+    build:
+      target: emacs-runtime
+      tags:
+        - emacs-runtime:latest
+      args:
+        EMACS_VERSION: ${SPOK_EMACS_VERSION}
+    depends_on:
+      emacs-builder:
+        required: true
+        condition: service_started
+    stdin_open: true
+    tty: true
+    shm_size: 2g
+    privileged: true
+    volumes:
+      - ${SPOK_X_SERVER_VOLUME}
+

@@ -1,0 +1,42 @@
+# ./spok --run . runtime
+
+name: spok
+
+include:
+  - layers/spok/compose.yml
+
+services:
+    spok-runtime:
+      image: spok-runtime:latest
+      environment:
+        PATH: ${SPOK_GOBIN}:${SPOK_XDG_PATH}
+        DISPLAY: $DISPLAY
+        BROSWER: /usr/bin/brave-browser
+        HOME: /home/${SPOK_USERNAME}
+        GH_USER_NAME: ${SPOK_GH_USER_NAME}
+        GH_USER_EMAIL: ${SPOK_GH_USER_EMAIL}
+        XDG_CONFIG_HOME: ${SPOK_USER_XDG_CONFIG_HOME}
+        SPACEMACSDIR: ${SPOK_SPACEMACSDIR}
+        LD_LIBRARY_PATH: ${SPOK_JDK_LD_LIBRARY_PATH}
+      env_file:
+        - .env
+      build:
+        tags:
+          - spok-runtime:latest
+        args:
+          USERNAME: ${SPOK_USERNAME}
+          EMACS_VERSION: ${SPOK_EMACS_VERSION}
+          JDK_VERSION: ${SPOK_JDK_VERSION}
+      depends_on:
+        spok-layer:
+          required: true
+          condition: service_started
+      stdin_open: true
+      tty: true
+      shm_size: 2g
+      privileged: true
+      volumes:
+        - home:/home/${SPOK_USERNAME}
+        - ${SPOK_X_SERVER_VOLUME}
+volumes:
+  home:

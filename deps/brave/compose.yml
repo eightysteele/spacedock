@@ -1,0 +1,33 @@
+name: brave
+
+services:
+  brave-builder:
+    image: brave-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      target: brave-builder
+      tags:
+        - brave-builder:latest
+  brave-runtime:
+    image: brave-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      DISPLAY: $DISPLAY
+    env_file:
+      - .env
+    build:
+      target: brave-runtime
+      tags:
+        - brave-runtime:latest
+    depends_on:
+      brave-builder:
+        required: true
+        condition: service_started
+    stdin_open: true
+    tty: true
+    shm_size: 2g
+    privileged: true
+    volumes:
+      - ${SPOK_X_SERVER_VOLUME}

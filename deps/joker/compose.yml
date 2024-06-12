@@ -1,0 +1,44 @@
+name: joker
+
+include:
+  - ../go/compose.yml
+
+services:
+  joker-builder:
+    image: joker-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${SPOK_JOKER_PATH}
+      GOBIN: ${SPOK_GOBIN}
+      GOROOT: ${SPOK_GOROOT}
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/joker/Dockerfile
+      target: joker-builder
+      tags:
+        - joker-builder:latest
+      args:
+        PATH: ${SPOK_JOKER_PATH}
+        GOROOT: ${SPOK_GOROOT}
+        GOBIN: ${SPOK_GOBIN}
+  joker-runtime:
+    image: joker-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${SPOK_JOKER_PATH}
+      GOBIN: ${SPOK_GOBIN}
+      GOROOT: ${SPOK_GOROOT}
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/joker/Dockerfile
+      target: joker-runtime
+      tags:
+        - joker-runtime:latest
+    depends_on:
+      go-builder:
+        required: true
+        condition: service_started

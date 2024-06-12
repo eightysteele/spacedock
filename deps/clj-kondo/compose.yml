@@ -1,0 +1,29 @@
+name: clj-kondo
+
+services:
+  clj-kondo-builder:
+    image: clj-kondo-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/clj-kondo/Dockerfile
+      target: clj-kondo-builder
+      tags:
+        - clj-kondo-builder:latest
+  clj-kondo-runtime:
+    image: clj-kondo-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/clj-kondo/Dockerfile
+      target: clj-kondo-runtime
+      tags:
+        - clj-kondo-runtime:latest
+    depends_on:
+      clj-kondo-builder:
+        required: true
+        condition: service_started

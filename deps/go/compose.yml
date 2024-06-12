@@ -1,0 +1,37 @@
+name: go
+
+services:
+  go-builder:
+    image: go-builder:latest
+    command: /usr/bin/tail -f /dev/null
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/go/Dockerfile
+      target: go-builder
+      tags:
+        - go-builder:latest
+      args:
+        GO_VERSION: ${SPOK_GO_VERSION}
+        GOROOT: ${SPOK_GOROOT}
+  go-runtime:
+    image: go-runtime:latest
+    command: /usr/bin/tail -f /dev/null
+    environment:
+      PATH: ${SPOK_GO_PATH}
+    env_file:
+      - .env
+    build:
+      context: ../../
+      dockerfile: deps/go/Dockerfile
+      target: go-runtime
+      tags:
+        - go-runtime:latest
+      args:
+        GO_VERSION: ${SPOK_GO_VERSION}
+        GOROOT: ${SPOK_GOROOT}
+    depends_on:
+      go-builder:
+        required: true
+        condition: service_started
